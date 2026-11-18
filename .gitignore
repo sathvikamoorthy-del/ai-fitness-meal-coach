@@ -1,3 +1,7 @@
 # KNM
 .claude/requirements.json
 .knm/
+node_modules
+dist
+coverage
+.env

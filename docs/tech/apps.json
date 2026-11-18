@@ -1,0 +1,4 @@
+[
+  { "name": "web", "type": "web", "language": "typescript", "framework": "react", "frameworkVersion": "18" },
+  { "name": "api", "type": "api", "language": "typescript", "framework": "express", "frameworkVersion": "4" }
+]

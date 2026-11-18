@@ -1,0 +1,14 @@
+{
+  "complete": true,
+  "missing": [],
+  "values": {
+    "sqlite-database": { "DATABASE_URL": "file:./data/app.db" },
+    "jwt-auth": { "JWT_SECRET": "<secret: set in env>" }
+  },
+  "record": {
+    "sqlite-database": { "DATABASE_URL": "file:./data/app.db" },
+    "jwt-auth": { "JWT_SECRET": "<secret: set in env>" }
+  },
+  "envRequired": { "sqlite-database": ["DATABASE_AUTH_TOKEN"] },
+  "keyCollisions": []
+}

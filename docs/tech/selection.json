@@ -1,0 +1,8 @@
+{
+  "apps": [
+    { "name": "web", "type": "web", "language": "typescript", "framework": "react", "frameworkVersion": "18",
+      "modules": { "frontend-framework": "react-vite", "styling": "chakra-styling", "state-management": "zustand-state", "testing": "jest-react" } },
+    { "name": "api", "type": "api", "language": "typescript", "framework": "express", "frameworkVersion": "4",
+      "modules": { "backend-framework": "express", "testing": "jest-testing", "build-tools": "node-build", "database": "sqlite-database", "orm": "drizzle-sqlite", "auth": "jwt-auth" } }
+  ]
+}
