@@ -1,1 +1,1 @@
-# -fitness-meal-coach
+# ai-fitness-meal-coach
