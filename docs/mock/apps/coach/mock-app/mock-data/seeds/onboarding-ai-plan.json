@@ -1,0 +1,188 @@
+{
+  "_sample": "Sample data only. Names, ids and numbers are invented.",
+  "today": "Wed 18 Nov 2026",
+  "account": {
+    "email": "priya.nair@example.com",
+    "password": "sample-pass-1",
+    "created": false
+  },
+  "profile": {
+    "age": 32,
+    "sex": "Female",
+    "heightCm": 163,
+    "weightKg": 68.4,
+    "goal": "Lose weight",
+    "fitnessLevel": "Beginner",
+    "dailyCalorieTarget": 1434,
+    "waterTargetMl": 2000,
+    "saved": false
+  },
+  "diet": {
+    "type": "Vegetarian",
+    "allergies": [
+      "Peanuts"
+    ],
+    "saved": false
+  },
+  "workoutPlan": {
+    "generated": false,
+    "days": [
+      {
+        "day": "Day 1",
+        "title": "Full body A",
+        "exercises": [
+          "Goblet squat 3 × 10",
+          "Push-up 3 × 8",
+          "Dumbbell row 3 × 10"
+        ]
+      },
+      {
+        "day": "Day 2",
+        "title": "Rest",
+        "exercises": []
+      },
+      {
+        "day": "Day 3",
+        "title": "Full body B",
+        "exercises": [
+          "Reverse lunge 3 × 10",
+          "Incline push-up 3 × 10",
+          "Glute bridge 3 × 12"
+        ]
+      },
+      {
+        "day": "Day 4",
+        "title": "Rest",
+        "exercises": []
+      },
+      {
+        "day": "Day 5",
+        "title": "Full body A",
+        "exercises": [
+          "Goblet squat 3 × 10",
+          "Push-up 3 × 8",
+          "Dumbbell row 3 × 10"
+        ]
+      },
+      {
+        "day": "Day 6",
+        "title": "Cardio",
+        "exercises": [
+          "Brisk walk 1 × 30 min"
+        ]
+      },
+      {
+        "day": "Day 7",
+        "title": "Rest",
+        "exercises": []
+      }
+    ]
+  },
+  "mealPlan": {
+    "generated": false,
+    "period": "Day",
+    "meals": [
+      {
+        "type": "Breakfast",
+        "name": "Oats with banana",
+        "description": "Rolled oats cooked in milk, topped with sliced banana"
+      },
+      {
+        "type": "Lunch",
+        "name": "Dal with brown rice",
+        "description": "Yellow moong dal, brown rice and cucumber salad"
+      },
+      {
+        "type": "Dinner",
+        "name": "Paneer stir-fry with roti",
+        "description": "Paneer, peppers and onion, two whole-wheat rotis"
+      },
+      {
+        "type": "Snack",
+        "name": "Greek yogurt with berries",
+        "description": "Plain Greek yogurt with mixed berries"
+      }
+    ]
+  },
+  "checklist": {
+    "workout": false,
+    "breakfast": false,
+    "lunch": false,
+    "dinner": false,
+    "snack": false
+  },
+  "mealLog": {
+    "type": "Breakfast",
+    "saved": false,
+    "items": [
+      {
+        "food": "Rolled oats",
+        "grams": 60,
+        "kcal": 227,
+        "protein": 7.9,
+        "carbs": 40.6,
+        "fat": 3.9
+      },
+      {
+        "food": "Banana",
+        "grams": 120,
+        "kcal": 107,
+        "protein": 1.3,
+        "carbs": 27.4,
+        "fat": 0.4
+      }
+    ]
+  },
+  "totals": {
+    "calories": 0,
+    "protein": 0,
+    "carbs": 0,
+    "fat": 0
+  },
+  "workoutLog": {
+    "date": "18 Nov 2026",
+    "saved": false,
+    "exercises": [
+      {
+        "name": "Goblet squat",
+        "sets": 3,
+        "reps": 10,
+        "kg": 8
+      },
+      {
+        "name": "Push-up",
+        "sets": 3,
+        "reps": 8,
+        "kg": 0
+      },
+      {
+        "name": "Dumbbell row",
+        "sets": 3,
+        "reps": 10,
+        "kg": 6
+      }
+    ]
+  },
+  "water": {
+    "totalMl": 750,
+    "amountMl": 250
+  },
+  "weight": {
+    "newKg": 68,
+    "added": false,
+    "entries": [
+      {
+        "date": "16 Nov 2026",
+        "kg": 68.4
+      },
+      {
+        "date": "13 Nov 2026",
+        "kg": 68.9
+      },
+      {
+        "date": "9 Nov 2026",
+        "kg": 69.3
+      }
+    ]
+  }
+}

@@ -13,3 +13,4 @@ Roles: User (individual; one user per account; no gyms, trainers or organisation
 | docs/requirements/ | Requirement documents of the imported features | draft | import-features |
 | docs/project/db_design.md | DB design: columns, target DB, constraints | draft | create-db-design |
 | docs/project/db_design_tables.csv | DB design: table list, feedback, status | draft | create-db-design |
+| docs/mock/ | Walkthroughs: coach, Sign up to first AI plans; A day of logging; gaps in apps/coach/gaps | draft | create-walkthrough |

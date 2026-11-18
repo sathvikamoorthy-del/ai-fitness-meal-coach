@@ -1,0 +1,21 @@
+{
+  "name": "coach",
+  "title": "AI Fitness & Meal Coach",
+  "spec": "docs/project/context.md",
+  "walkthroughs": [
+    {
+      "id": "onboarding-ai-plan",
+      "title": "Sign up to first AI plans",
+      "description": "A new user signs up, signs in, sets profile, goal, diet and allergies, then gets an AI weekly workout plan and an AI meal plan (G1).",
+      "sequenceFile": "sequences/onboarding-ai-plan.json",
+      "seedData": "mock-app/mock-data/seeds/onboarding-ai-plan.json"
+    },
+    {
+      "id": "daily-logging",
+      "title": "A day of logging",
+      "description": "From today's checklist the user ticks breakfast, logs a meal, checks calories, logs a workout, water and weight (G2, G3).",
+      "sequenceFile": "sequences/daily-logging.json",
+      "seedData": "mock-app/mock-data/seeds/daily-logging.json"
+    }
+  ]
+}

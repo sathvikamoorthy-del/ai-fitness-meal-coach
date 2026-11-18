@@ -1,0 +1,95 @@
+{
+  "id": "onboarding-ai-plan",
+  "title": "Sign up to first AI plans",
+  "startStep": "sign-up",
+  "completionMessage": "{users.user.name} has an account, a saved profile and goal (daily target {profile.dailyCalorieTarget} kcal), diet and allergies, an AI weekly workout plan and an AI meal plan (goal G1). Next in the real app: daily logging against these plans.",
+  "steps": {
+    "sign-up": {
+      "user": "user",
+      "screen": "S01",
+      "proposedAction": "Enter email and password, then click Sign up",
+      "infoPanel": [{ "key": "account.email", "label": "Email" }],
+      "actions": {
+        "sign-up": { "performedText": "created an account", "nextStep": "sign-in", "stateChange": { "account.created": { "set": true } } }
+      }
+    },
+    "sign-in": {
+      "user": "user",
+      "screen": "S01",
+      "proposedAction": "Click Sign in with the same email and password",
+      "actions": {
+        "sign-in": { "performedText": "signed in", "nextStep": "profile" }
+      }
+    },
+    "profile": {
+      "user": "user",
+      "screen": "S02",
+      "proposedAction": "Fill in age, sex, height, weight, goal and fitness level, then click Save",
+      "infoPanel": [
+        { "key": "profile.goal", "label": "Goal" },
+        { "key": "profile.fitnessLevel", "label": "Fitness level" }
+      ],
+      "actions": {
+        "save-profile": { "performedText": "saved the profile and goal", "nextStep": "profile-saved", "stateChange": { "profile.saved": { "set": true } } }
+      }
+    },
+    "profile-saved": {
+      "user": "user",
+      "screen": "S02",
+      "proposedAction": "Check the daily calorie target, then click Diet and allergies",
+      "infoPanel": [{ "key": "profile.dailyCalorieTarget", "label": "Daily calorie target (kcal)" }],
+      "actions": {
+        "open-diet": { "performedText": "opened diet and allergies", "nextStep": "diet" }
+      }
+    },
+    "diet": {
+      "user": "user",
+      "screen": "S03",
+      "proposedAction": "Choose Vegetarian, keep the Peanuts allergy, then click Save",
+      "infoPanel": [{ "key": "diet.type", "label": "Diet" }],
+      "actions": {
+        "save-diet": { "performedText": "saved diet and allergies", "nextStep": "diet-saved", "stateChange": { "diet.saved": { "set": true } } }
+      }
+    },
+    "diet-saved": {
+      "user": "user",
+      "screen": "S03",
+      "proposedAction": "Open the Workouts tab",
+      "actions": {
+        "goto-S04": { "performedText": "opened Workouts", "nextStep": "workout-plan" }
+      }
+    },
+    "workout-plan": {
+      "user": "user",
+      "screen": "S04",
+      "proposedAction": "Click Generate to get an AI weekly workout plan",
+      "actions": {
+        "generate-workout": { "performedText": "asked the AI for a weekly workout plan", "nextStep": "workout-plan-ready", "stateChange": { "workoutPlan.generated": { "set": true } } }
+      }
+    },
+    "workout-plan-ready": {
+      "user": "user",
+      "screen": "S04",
+      "proposedAction": "Review the week, then open the Meals tab",
+      "actions": {
+        "goto-S05": { "performedText": "opened Meals", "nextStep": "meal-plan" }
+      }
+    },
+    "meal-plan": {
+      "user": "user",
+      "screen": "S05",
+      "proposedAction": "Keep Day, then click Generate",
+      "infoPanel": [{ "key": "mealPlan.period", "label": "Plan for" }],
+      "actions": {
+        "generate-meal": { "performedText": "asked the AI for a meal plan", "nextStep": "meal-plan-ready", "stateChange": { "mealPlan.generated": { "set": true } } }
+      }
+    },
+    "meal-plan-ready": {
+      "user": "user",
+      "screen": "S05",
+      "proposedAction": "Check the meals are vegetarian and peanut-free",
+      "performedText": "reviewed the AI meal plan",
+      "nextStep": null
+    }
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "apps": [
+    {
+      "name": "coach",
+      "title": "AI Fitness & Meal Coach",
+      "platform": "desktop"
+    }
+  ]
+}

@@ -1,0 +1,141 @@
+{
+  "id": "daily-logging",
+  "title": "A day of logging",
+  "startStep": "today",
+  "completionMessage": "{users.user.name} ticked breakfast, logged a meal ({totals.calories} of {profile.dailyCalorieTarget} kcal), a workout session, water ({water.totalMl} ml) and weight ({profile.weightKg} kg) (goals G2 and G3). Next in the real app: progress charts and the weekly report.",
+  "steps": {
+    "today": {
+      "user": "user",
+      "screen": "S06",
+      "proposedAction": "Tick Breakfast",
+      "actions": {
+        "tick-breakfast": { "performedText": "ticked breakfast", "nextStep": "today-ticked", "stateChange": { "checklist.breakfast": { "set": true } } }
+      }
+    },
+    "today-ticked": {
+      "user": "user",
+      "screen": "S06",
+      "proposedAction": "Click Log a meal",
+      "actions": {
+        "log-meal": { "performedText": "opened Log meal", "nextStep": "log-meal" }
+      }
+    },
+    "log-meal": {
+      "user": "user",
+      "screen": "S07",
+      "proposedAction": "Check Breakfast with oats and banana, then click Save",
+      "actions": {
+        "save-meal": {
+          "performedText": "saved breakfast",
+          "nextStep": "meal-saved",
+          "stateChange": {
+            "mealLog.saved": { "set": true },
+            "totals.calories": { "set": 334 },
+            "totals.protein": { "set": 9.2 },
+            "totals.carbs": { "set": 68 },
+            "totals.fat": { "set": 4.3 }
+          }
+        }
+      }
+    },
+    "meal-saved": {
+      "user": "user",
+      "screen": "S07",
+      "proposedAction": "Open the Calories tab",
+      "actions": {
+        "goto-S08": { "performedText": "opened Calories", "nextStep": "summary" }
+      }
+    },
+    "summary": {
+      "user": "user",
+      "screen": "S08",
+      "proposedAction": "Check the totals against the target, then open the Today tab",
+      "infoPanel": [
+        { "key": "totals.calories", "label": "Calories today" },
+        { "key": "profile.dailyCalorieTarget", "label": "Target (kcal)" }
+      ],
+      "actions": {
+        "goto-S06": { "performedText": "went back to Today", "nextStep": "today-workout" }
+      }
+    },
+    "today-workout": {
+      "user": "user",
+      "screen": "S06",
+      "proposedAction": "Click Log a workout",
+      "actions": {
+        "log-workout": { "performedText": "opened Log workout", "nextStep": "log-workout" }
+      }
+    },
+    "log-workout": {
+      "user": "user",
+      "screen": "S09",
+      "proposedAction": "Check the exercises, sets, reps and weights, then click Save",
+      "actions": {
+        "save-workout": { "performedText": "saved the workout session", "nextStep": "workout-saved", "stateChange": { "workoutLog.saved": { "set": true } } }
+      }
+    },
+    "workout-saved": {
+      "user": "user",
+      "screen": "S09",
+      "proposedAction": "Open the Today tab",
+      "actions": {
+        "goto-S06": { "performedText": "went back to Today", "nextStep": "today-water" }
+      }
+    },
+    "today-water": {
+      "user": "user",
+      "screen": "S06",
+      "proposedAction": "Click Add water",
+      "actions": {
+        "add-water": { "performedText": "opened Water", "nextStep": "water" }
+      }
+    },
+    "water": {
+      "user": "user",
+      "screen": "S11",
+      "proposedAction": "Keep 250 ml, then click Add",
+      "infoPanel": [{ "key": "water.totalMl", "label": "Water today (ml)" }],
+      "actions": {
+        "add-water-amount": { "performedText": "added {water.amountMl} ml of water", "nextStep": "water-added", "stateChange": { "water.totalMl": 250 } }
+      }
+    },
+    "water-added": {
+      "user": "user",
+      "screen": "S11",
+      "proposedAction": "Check the new total, then open the Today tab",
+      "infoPanel": [{ "key": "water.totalMl", "label": "Water today (ml)" }],
+      "actions": {
+        "goto-S06": { "performedText": "went back to Today", "nextStep": "today-weight" }
+      }
+    },
+    "today-weight": {
+      "user": "user",
+      "screen": "S06",
+      "proposedAction": "Click Add weight",
+      "actions": {
+        "add-weight": { "performedText": "opened Weight", "nextStep": "weight" }
+      }
+    },
+    "weight": {
+      "user": "user",
+      "screen": "S10",
+      "proposedAction": "Enter today's weight, then click Add",
+      "infoPanel": [{ "key": "profile.weightKg", "label": "Profile weight (kg)" }],
+      "actions": {
+        "save-weight": {
+          "performedText": "added today's weight",
+          "nextStep": "weight-added",
+          "stateChange": { "weight.added": { "set": true }, "profile.weightKg": { "copy": "weight.newKg" } }
+        }
+      }
+    },
+    "weight-added": {
+      "user": "user",
+      "screen": "S10",
+      "proposedAction": "Check the new entry in the list",
+      "infoPanel": [{ "key": "profile.weightKg", "label": "Profile weight (kg)" }],
+      "performedText": "checked the weight history",
+      "nextStep": null
+    }
+  }
+}
