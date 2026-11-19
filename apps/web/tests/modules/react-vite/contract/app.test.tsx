@@ -26,8 +26,9 @@ describe('app shell contract', () => {
     expect(container.firstChild).toBe(outer);
   });
 
-  it('works with the scaffold glue as it is (no modules registered yet: the not-found page)', () => {
-    render(<App Router={at('/')} />);
+  it('works with the glue routes as they are (an unknown URL: the not-found page)', () => {
+    // Adapted in WI-045: the glue now registers app routes, so '/' is no longer the not-found page.
+    render(<App Router={at('/no-such-page')} />);
     expect(screen.getByText('Page not found')).toBeTruthy();
   });
 
