@@ -1,0 +1,1835 @@
+{
+  "version": 1,
+  "tables": {
+    "users": {
+      "hash": "774604c84a7ee89e",
+      "columns": [
+        {
+          "name": "id",
+          "type": "TEXT",
+          "nullable": false,
+          "default": "",
+          "pk": true,
+          "unique": false,
+          "index": false,
+          "unmapped": []
+        },
+        {
+          "name": "email",
+          "type": "TEXT",
+          "nullable": false,
+          "default": "",
+          "pk": false,
+          "unique": true,
+          "index": true,
+          "unmapped": [
+            "COLLATE NOCASE"
+          ]
+        },
+        {
+          "name": "password_hash",
+          "type": "TEXT",
+          "nullable": false,
+          "default": "",
+          "pk": false,
+          "unique": false,
+          "index": false,
+          "unmapped": []
+        },
+        {
+          "name": "created_at",
+          "type": "TEXT",
+          "nullable": false,
+          "default": "(strftime('%Y-%m-%dT%H:%M:%fZ','now'))",
+          "pk": false,
+          "unique": false,
+          "index": false,
+          "unmapped": []
+        },
+        {
+          "name": "updated_at",
+          "type": "TEXT",
+          "nullable": false,
+          "default": "(strftime('%Y-%m-%dT%H:%M:%fZ','now'))",
+          "pk": false,
+          "unique": false,
+          "index": false,
+          "unmapped": []
+        }
+      ]
+    },
+    "sessions": {
+      "hash": "eb25059a808c72af",
+      "columns": [
+        {
+          "name": "id",
+          "type": "TEXT",
+          "nullable": false,
+          "default": "",
+          "pk": true,
+          "unique": false,
+          "index": false,
+          "unmapped": []
+        },
+        {
+          "name": "user_id",
+          "type": "TEXT",
+          "nullable": false,
+          "default": "",
+          "pk": false,
+          "unique": false,
+          "index": true,
+          "unmapped": [],
+          "fk": {
+            "table": "users",
+            "column": "id"
+          },
+          "onDelete": "cascade"
+        },
+        {
+          "name": "expires_at",
+          "type": "TEXT",
+          "nullable": false,
+          "default": "",
+          "pk": false,
+          "unique": false,
+          "index": true,
+          "unmapped": []
+        },
+        {
+          "name": "created_at",
+          "type": "TEXT",
+          "nullable": false,
+          "default": "(strftime('%Y-%m-%dT%H:%M:%fZ','now'))",
+          "pk": false,
+          "unique": false,
+          "index": false,
+          "unmapped": []
+        }
+      ]
+    },
+    "goal_types": {
+      "hash": "7fff32c1081ef17a",
+      "columns": [
+        {
+          "name": "code",
+          "type": "TEXT",
+          "nullable": false,
+          "default": "",
+          "pk": true,
+          "unique": false,
+          "index": false,
+          "unmapped": []
+        },
+        {
+          "name": "label",
+          "type": "TEXT",
+          "nullable": false,
+          "default": "",
+          "pk": false,
+          "unique": false,
+          "index": false,
+          "unmapped": []
+        }
+      ]
+    },
+    "diet_types": {
+      "hash": "2c3eb065808d701b",
+      "columns": [
+        {
+          "name": "code",
+          "type": "TEXT",
+          "nullable": false,
+          "default": "",
+          "pk": true,
+          "unique": false,
+          "index": false,
+          "unmapped": []
+        },
+        {
+          "name": "label",
+          "type": "TEXT",
+          "nullable": false,
+          "default": "",
+          "pk": false,
+          "unique": false,
+          "index": false,
+          "unmapped": []
+        }
+      ]
+    },
+    "fitness_levels": {
+      "hash": "fa87d5a8bde53be8",
+      "columns": [
+        {
+          "name": "code",
+          "type": "TEXT",
+          "nullable": false,
+          "default": "",
+          "pk": true,
+          "unique": false,
+          "index": false,
+          "unmapped": []
+        },
+        {
+          "name": "label",
+          "type": "TEXT",
+          "nullable": false,
+          "default": "",
+          "pk": false,
+          "unique": false,
+          "index": false,
+          "unmapped": []
+        }
+      ]
+    },
+    "profiles": {
+      "hash": "ce8628b004385067",
+      "columns": [
+        {
+          "name": "user_id",
+          "type": "TEXT",
+          "nullable": false,
+          "default": "",
+          "pk": true,
+          "unique": false,
+          "index": false,
+          "unmapped": [],
+          "fk": {
+            "table": "users",
+            "column": "id"
+          },
+          "onDelete": "cascade"
+        },
+        {
+          "name": "age",
+          "type": "INTEGER",
+          "nullable": true,
+          "default": "",
+          "pk": false,
+          "unique": false,
+          "index": false,
+          "unmapped": [
+            "> 0"
+          ]
+        },
+        {
+          "name": "sex",
+          "type": "TEXT",
+          "nullable": true,
+          "default": "",
+          "pk": false,
+          "unique": false,
+          "index": false,
+          "unmapped": [
+            "in ('male','female')"
+          ]
+        },
+        {
+          "name": "height_cm",
+          "type": "REAL",
+          "nullable": true,
+          "default": "",
+          "pk": false,
+          "unique": false,
+          "index": false,
+          "unmapped": [
+            "> 0"
+          ]
+        },
+        {
+          "name": "weight_kg",
+          "type": "REAL",
+          "nullable": true,
+          "default": "",
+          "pk": false,
+          "unique": false,
+          "index": false,
+          "unmapped": [
+            "> 0"
+          ]
+        },
+        {
+          "name": "goal_type",
+          "type": "TEXT",
+          "nullable": true,
+          "default": "",
+          "pk": false,
+          "unique": false,
+          "index": false,
+          "unmapped": [],
+          "fk": {
+            "table": "goal_types",
+            "column": "code"
+          }
+        },
+        {
+          "name": "fitness_level",
+          "type": "TEXT",
+          "nullable": true,
+          "default": "",
+          "pk": false,
+          "unique": false,
+          "index": false,
+          "unmapped": [],
+          "fk": {
+            "table": "fitness_levels",
+            "column": "code"
+          }
+        },
+        {
+          "name": "diet_type",
+          "type": "TEXT",
+          "nullable": true,
+          "default": "",
+          "pk": false,
+          "unique": false,
+          "index": false,
+          "unmapped": [],
+          "fk": {
+            "table": "diet_types",
+            "column": "code"
+          }
+        },
+        {
+          "name": "daily_calorie_target",
+          "type": "REAL",
+          "nullable": true,
+          "default": "",
+          "pk": false,
+          "unique": false,
+          "index": false,
+          "unmapped": [
+            "> 0"
+          ]
+        },
+        {
+          "name": "daily_water_target_ml",
+          "type": "INTEGER",
+          "nullable": false,
+          "default": "2000",
+          "pk": false,
+          "unique": false,
+          "index": false,
+          "unmapped": [
+            "> 0"
+          ]
+        },
+        {
+          "name": "created_at",
+          "type": "TEXT",
+          "nullable": false,
+          "default": "(strftime('%Y-%m-%dT%H:%M:%fZ','now'))",
+          "pk": false,
+          "unique": false,
+          "index": false,
+          "unmapped": []
+        },
+        {
+          "name": "updated_at",
+          "type": "TEXT",
+          "nullable": false,
+          "default": "(strftime('%Y-%m-%dT%H:%M:%fZ','now'))",
+          "pk": false,
+          "unique": false,
+          "index": false,
+          "unmapped": []
+        }
+      ]
+    },
+    "user_allergies": {
+      "hash": "f2ef6f05c4b4d397",
+      "columns": [
+        {
+          "name": "id",
+          "type": "TEXT",
+          "nullable": false,
+          "default": "",
+          "pk": true,
+          "unique": false,
+          "index": false,
+          "unmapped": []
+        },
+        {
+          "name": "user_id",
+          "type": "TEXT",
+          "nullable": false,
+          "default": "",
+          "pk": false,
+          "unique": false,
+          "index": true,
+          "unmapped": [],
+          "fk": {
+            "table": "users",
+            "column": "id"
+          },
+          "onDelete": "cascade"
+        },
+        {
+          "name": "name",
+          "type": "TEXT",
+          "nullable": false,
+          "default": "",
+          "pk": false,
+          "unique": false,
+          "index": false,
+          "unmapped": [
+            "UQ (user_id, name)"
+          ]
+        },
+        {
+          "name": "created_at",
+          "type": "TEXT",
+          "nullable": false,
+          "default": "(strftime('%Y-%m-%dT%H:%M:%fZ','now'))",
+          "pk": false,
+          "unique": false,
+          "index": false,
+          "unmapped": []
+        }
+      ]
+    },
+    "exercises": {
+      "hash": "9240a910b28d3579",
+      "columns": [
+        {
+          "name": "id",
+          "type": "TEXT",
+          "nullable": false,
+          "default": "",
+          "pk": true,
+          "unique": false,
+          "index": false,
+          "unmapped": []
+        },
+        {
+          "name": "name",
+          "type": "TEXT",
+          "nullable": false,
+          "default": "",
+          "pk": false,
+          "unique": true,
+          "index": true,
+          "unmapped": [
+            "COLLATE NOCASE"
+          ]
+        },
+        {
+          "name": "created_at",
+          "type": "TEXT",
+          "nullable": false,
+          "default": "(strftime('%Y-%m-%dT%H:%M:%fZ','now'))",
+          "pk": false,
+          "unique": false,
+          "index": false,
+          "unmapped": []
+        },
+        {
+          "name": "updated_at",
+          "type": "TEXT",
+          "nullable": false,
+          "default": "(strftime('%Y-%m-%dT%H:%M:%fZ','now'))",
+          "pk": false,
+          "unique": false,
+          "index": false,
+          "unmapped": []
+        }
+      ]
+    },
+    "plan_sources": {
+      "hash": "7b2c43edf34c2cf3",
+      "columns": [
+        {
+          "name": "code",
+          "type": "TEXT",
+          "nullable": false,
+          "default": "",
+          "pk": true,
+          "unique": false,
+          "index": false,
+          "unmapped": []
+        },
+        {
+          "name": "label",
+          "type": "TEXT",
+          "nullable": false,
+          "default": "",
+          "pk": false,
+          "unique": false,
+          "index": false,
+          "unmapped": []
+        }
+      ]
+    },
+    "workout_plans": {
+      "hash": "f92aecbb925e08be",
+      "columns": [
+        {
+          "name": "id",
+          "type": "TEXT",
+          "nullable": false,
+          "default": "",
+          "pk": true,
+          "unique": false,
+          "index": false,
+          "unmapped": []
+        },
+        {
+          "name": "user_id",
+          "type": "TEXT",
+          "nullable": false,
+          "default": "",
+          "pk": false,
+          "unique": false,
+          "index": true,
+          "unmapped": [],
+          "fk": {
+            "table": "users",
+            "column": "id"
+          },
+          "onDelete": "cascade"
+        },
+        {
+          "name": "source",
+          "type": "TEXT",
+          "nullable": false,
+          "default": "",
+          "pk": false,
+          "unique": false,
+          "index": false,
+          "unmapped": [],
+          "fk": {
+            "table": "plan_sources",
+            "column": "code"
+          }
+        },
+        {
+          "name": "is_active",
+          "type": "INTEGER",
+          "nullable": false,
+          "default": "0",
+          "pk": false,
+          "unique": false,
+          "index": false,
+          "unmapped": [
+            "in (0,1)",
+            "UQ (user_id) where is_active = 1"
+          ]
+        },
+        {
+          "name": "created_at",
+          "type": "TEXT",
+          "nullable": false,
+          "default": "(strftime('%Y-%m-%dT%H:%M:%fZ','now'))",
+          "pk": false,
+          "unique": false,
+          "index": false,
+          "unmapped": []
+        },
+        {
+          "name": "updated_at",
+          "type": "TEXT",
+          "nullable": false,
+          "default": "(strftime('%Y-%m-%dT%H:%M:%fZ','now'))",
+          "pk": false,
+          "unique": false,
+          "index": false,
+          "unmapped": []
+        }
+      ]
+    },
+    "workout_plan_days": {
+      "hash": "84627a722c7c954c",
+      "columns": [
+        {
+          "name": "id",
+          "type": "TEXT",
+          "nullable": false,
+          "default": "",
+          "pk": true,
+          "unique": false,
+          "index": false,
+          "unmapped": []
+        },
+        {
+          "name": "workout_plan_id",
+          "type": "TEXT",
+          "nullable": false,
+          "default": "",
+          "pk": false,
+          "unique": false,
+          "index": true,
+          "unmapped": [],
+          "fk": {
+            "table": "workout_plans",
+            "column": "id"
+          },
+          "onDelete": "cascade"
+        },
+        {
+          "name": "day_number",
+          "type": "INTEGER",
+          "nullable": false,
+          "default": "",
+          "pk": false,
+          "unique": false,
+          "index": false,
+          "unmapped": [
+            ">= 1",
+            "UQ (workout_plan_id, day_number)"
+          ]
+        }
+      ]
+    },
+    "workout_plan_exercises": {
+      "hash": "45bd223b1e3bd16f",
+      "columns": [
+        {
+          "name": "id",
+          "type": "TEXT",
+          "nullable": false,
+          "default": "",
+          "pk": true,
+          "unique": false,
+          "index": false,
+          "unmapped": []
+        },
+        {
+          "name": "workout_plan_day_id",
+          "type": "TEXT",
+          "nullable": false,
+          "default": "",
+          "pk": false,
+          "unique": false,
+          "index": true,
+          "unmapped": [],
+          "fk": {
+            "table": "workout_plan_days",
+            "column": "id"
+          },
+          "onDelete": "cascade"
+        },
+        {
+          "name": "exercise_id",
+          "type": "TEXT",
+          "nullable": false,
+          "default": "",
+          "pk": false,
+          "unique": false,
+          "index": true,
+          "unmapped": [],
+          "fk": {
+            "table": "exercises",
+            "column": "id"
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "position",
+          "type": "INTEGER",
+          "nullable": false,
+          "default": "",
+          "pk": false,
+          "unique": false,
+          "index": false,
+          "unmapped": [
+            ">= 1"
+          ]
+        },
+        {
+          "name": "sets",
+          "type": "INTEGER",
+          "nullable": false,
+          "default": "",
+          "pk": false,
+          "unique": false,
+          "index": false,
+          "unmapped": [
+            "> 0"
+          ]
+        },
+        {
+          "name": "reps",
+          "type": "INTEGER",
+          "nullable": false,
+          "default": "",
+          "pk": false,
+          "unique": false,
+          "index": false,
+          "unmapped": [
+            "> 0"
+          ]
+        }
+      ]
+    },
+    "workout_sessions": {
+      "hash": "cc5c2a1842f94e8e",
+      "columns": [
+        {
+          "name": "id",
+          "type": "TEXT",
+          "nullable": false,
+          "default": "",
+          "pk": true,
+          "unique": false,
+          "index": false,
+          "unmapped": []
+        },
+        {
+          "name": "user_id",
+          "type": "TEXT",
+          "nullable": false,
+          "default": "",
+          "pk": false,
+          "unique": false,
+          "index": false,
+          "unmapped": [],
+          "fk": {
+            "table": "users",
+            "column": "id"
+          },
+          "onDelete": "cascade"
+        },
+        {
+          "name": "session_date",
+          "type": "TEXT",
+          "nullable": false,
+          "default": "",
+          "pk": false,
+          "unique": false,
+          "index": false,
+          "unmapped": [
+            "YYYY-MM-DD"
+          ]
+        },
+        {
+          "name": "created_at",
+          "type": "TEXT",
+          "nullable": false,
+          "default": "(strftime('%Y-%m-%dT%H:%M:%fZ','now'))",
+          "pk": false,
+          "unique": false,
+          "index": false,
+          "unmapped": []
+        },
+        {
+          "name": "updated_at",
+          "type": "TEXT",
+          "nullable": false,
+          "default": "(strftime('%Y-%m-%dT%H:%M:%fZ','now'))",
+          "pk": false,
+          "unique": false,
+          "index": false,
+          "unmapped": []
+        }
+      ]
+    },
+    "workout_session_exercises": {
+      "hash": "e50e5a1de7b46f6a",
+      "columns": [
+        {
+          "name": "id",
+          "type": "TEXT",
+          "nullable": false,
+          "default": "",
+          "pk": true,
+          "unique": false,
+          "index": false,
+          "unmapped": []
+        },
+        {
+          "name": "workout_session_id",
+          "type": "TEXT",
+          "nullable": false,
+          "default": "",
+          "pk": false,
+          "unique": false,
+          "index": true,
+          "unmapped": [],
+          "fk": {
+            "table": "workout_sessions",
+            "column": "id"
+          },
+          "onDelete": "cascade"
+        },
+        {
+          "name": "exercise_id",
+          "type": "TEXT",
+          "nullable": false,
+          "default": "",
+          "pk": false,
+          "unique": false,
+          "index": true,
+          "unmapped": [],
+          "fk": {
+            "table": "exercises",
+            "column": "id"
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "position",
+          "type": "INTEGER",
+          "nullable": false,
+          "default": "",
+          "pk": false,
+          "unique": false,
+          "index": false,
+          "unmapped": [
+            ">= 1"
+          ]
+        },
+        {
+          "name": "sets",
+          "type": "INTEGER",
+          "nullable": false,
+          "default": "",
+          "pk": false,
+          "unique": false,
+          "index": false,
+          "unmapped": [
+            "> 0"
+          ]
+        },
+        {
+          "name": "reps",
+          "type": "INTEGER",
+          "nullable": false,
+          "default": "",
+          "pk": false,
+          "unique": false,
+          "index": false,
+          "unmapped": [
+            "> 0"
+          ]
+        },
+        {
+          "name": "weight_kg",
+          "type": "REAL",
+          "nullable": false,
+          "default": "",
+          "pk": false,
+          "unique": false,
+          "index": false,
+          "unmapped": [
+            ">= 0"
+          ]
+        }
+      ]
+    },
+    "foods": {
+      "hash": "730c4e9934e95baa",
+      "columns": [
+        {
+          "name": "id",
+          "type": "TEXT",
+          "nullable": false,
+          "default": "",
+          "pk": true,
+          "unique": false,
+          "index": false,
+          "unmapped": []
+        },
+        {
+          "name": "name",
+          "type": "TEXT",
+          "nullable": false,
+          "default": "",
+          "pk": false,
+          "unique": true,
+          "index": true,
+          "unmapped": [
+            "COLLATE NOCASE"
+          ]
+        },
+        {
+          "name": "calories",
+          "type": "REAL",
+          "nullable": false,
+          "default": "",
+          "pk": false,
+          "unique": false,
+          "index": false,
+          "unmapped": [
+            ">= 0"
+          ]
+        },
+        {
+          "name": "protein_g",
+          "type": "REAL",
+          "nullable": false,
+          "default": "",
+          "pk": false,
+          "unique": false,
+          "index": false,
+          "unmapped": [
+            ">= 0"
+          ]
+        },
+        {
+          "name": "carbs_g",
+          "type": "REAL",
+          "nullable": false,
+          "default": "",
+          "pk": false,
+          "unique": false,
+          "index": false,
+          "unmapped": [
+            ">= 0"
+          ]
+        },
+        {
+          "name": "fat_g",
+          "type": "REAL",
+          "nullable": false,
+          "default": "",
+          "pk": false,
+          "unique": false,
+          "index": false,
+          "unmapped": [
+            ">= 0"
+          ]
+        },
+        {
+          "name": "created_at",
+          "type": "TEXT",
+          "nullable": false,
+          "default": "(strftime('%Y-%m-%dT%H:%M:%fZ','now'))",
+          "pk": false,
+          "unique": false,
+          "index": false,
+          "unmapped": []
+        },
+        {
+          "name": "updated_at",
+          "type": "TEXT",
+          "nullable": false,
+          "default": "(strftime('%Y-%m-%dT%H:%M:%fZ','now'))",
+          "pk": false,
+          "unique": false,
+          "index": false,
+          "unmapped": []
+        }
+      ]
+    },
+    "meal_types": {
+      "hash": "d9c2686cc05ee6b1",
+      "columns": [
+        {
+          "name": "code",
+          "type": "TEXT",
+          "nullable": false,
+          "default": "",
+          "pk": true,
+          "unique": false,
+          "index": false,
+          "unmapped": []
+        },
+        {
+          "name": "label",
+          "type": "TEXT",
+          "nullable": false,
+          "default": "",
+          "pk": false,
+          "unique": false,
+          "index": false,
+          "unmapped": []
+        }
+      ]
+    },
+    "meal_logs": {
+      "hash": "0dea5745dac4644d",
+      "columns": [
+        {
+          "name": "id",
+          "type": "TEXT",
+          "nullable": false,
+          "default": "",
+          "pk": true,
+          "unique": false,
+          "index": false,
+          "unmapped": []
+        },
+        {
+          "name": "user_id",
+          "type": "TEXT",
+          "nullable": false,
+          "default": "",
+          "pk": false,
+          "unique": false,
+          "index": false,
+          "unmapped": [],
+          "fk": {
+            "table": "users",
+            "column": "id"
+          },
+          "onDelete": "cascade"
+        },
+        {
+          "name": "log_date",
+          "type": "TEXT",
+          "nullable": false,
+          "default": "",
+          "pk": false,
+          "unique": false,
+          "index": false,
+          "unmapped": [
+            "YYYY-MM-DD"
+          ]
+        },
+        {
+          "name": "meal_type",
+          "type": "TEXT",
+          "nullable": false,
+          "default": "",
+          "pk": false,
+          "unique": false,
+          "index": false,
+          "unmapped": [],
+          "fk": {
+            "table": "meal_types",
+            "column": "code"
+          }
+        },
+        {
+          "name": "created_at",
+          "type": "TEXT",
+          "nullable": false,
+          "default": "(strftime('%Y-%m-%dT%H:%M:%fZ','now'))",
+          "pk": false,
+          "unique": false,
+          "index": false,
+          "unmapped": []
+        },
+        {
+          "name": "updated_at",
+          "type": "TEXT",
+          "nullable": false,
+          "default": "(strftime('%Y-%m-%dT%H:%M:%fZ','now'))",
+          "pk": false,
+          "unique": false,
+          "index": false,
+          "unmapped": []
+        }
+      ]
+    },
+    "meal_log_items": {
+      "hash": "01670c1cc0a390f6",
+      "columns": [
+        {
+          "name": "id",
+          "type": "TEXT",
+          "nullable": false,
+          "default": "",
+          "pk": true,
+          "unique": false,
+          "index": false,
+          "unmapped": []
+        },
+        {
+          "name": "meal_log_id",
+          "type": "TEXT",
+          "nullable": false,
+          "default": "",
+          "pk": false,
+          "unique": false,
+          "index": true,
+          "unmapped": [],
+          "fk": {
+            "table": "meal_logs",
+            "column": "id"
+          },
+          "onDelete": "cascade"
+        },
+        {
+          "name": "food_id",
+          "type": "TEXT",
+          "nullable": false,
+          "default": "",
+          "pk": false,
+          "unique": false,
+          "index": true,
+          "unmapped": [],
+          "fk": {
+            "table": "foods",
+            "column": "id"
+          },
+          "onDelete": "restrict"
+        },
+        {
+          "name": "amount_g",
+          "type": "REAL",
+          "nullable": false,
+          "default": "",
+          "pk": false,
+          "unique": false,
+          "index": false,
+          "unmapped": [
+            "> 0"
+          ]
+        }
+      ]
+    },
+    "meal_plans": {
+      "hash": "3c18bc7621fe8fda",
+      "columns": [
+        {
+          "name": "id",
+          "type": "TEXT",
+          "nullable": false,
+          "default": "",
+          "pk": true,
+          "unique": false,
+          "index": false,
+          "unmapped": []
+        },
+        {
+          "name": "user_id",
+          "type": "TEXT",
+          "nullable": false,
+          "default": "",
+          "pk": false,
+          "unique": false,
+          "index": true,
+          "unmapped": [],
+          "fk": {
+            "table": "users",
+            "column": "id"
+          },
+          "onDelete": "cascade"
+        },
+        {
+          "name": "period",
+          "type": "TEXT",
+          "nullable": false,
+          "default": "",
+          "pk": false,
+          "unique": false,
+          "index": false,
+          "unmapped": [
+            "in ('day','week')"
+          ]
+        },
+        {
+          "name": "created_at",
+          "type": "TEXT",
+          "nullable": false,
+          "default": "(strftime('%Y-%m-%dT%H:%M:%fZ','now'))",
+          "pk": false,
+          "unique": false,
+          "index": false,
+          "unmapped": []
+        },
+        {
+          "name": "updated_at",
+          "type": "TEXT",
+          "nullable": false,
+          "default": "(strftime('%Y-%m-%dT%H:%M:%fZ','now'))",
+          "pk": false,
+          "unique": false,
+          "index": false,
+          "unmapped": []
+        }
+      ]
+    },
+    "meal_plan_meals": {
+      "hash": "1413ae7fe1d8ba5b",
+      "columns": [
+        {
+          "name": "id",
+          "type": "TEXT",
+          "nullable": false,
+          "default": "",
+          "pk": true,
+          "unique": false,
+          "index": false,
+          "unmapped": []
+        },
+        {
+          "name": "meal_plan_id",
+          "type": "TEXT",
+          "nullable": false,
+          "default": "",
+          "pk": false,
+          "unique": false,
+          "index": true,
+          "unmapped": [],
+          "fk": {
+            "table": "meal_plans",
+            "column": "id"
+          },
+          "onDelete": "cascade"
+        },
+        {
+          "name": "day_number",
+          "type": "INTEGER",
+          "nullable": false,
+          "default": "1",
+          "pk": false,
+          "unique": false,
+          "index": false,
+          "unmapped": [
+            ">= 1"
+          ]
+        },
+        {
+          "name": "meal_type",
+          "type": "TEXT",
+          "nullable": false,
+          "default": "",
+          "pk": false,
+          "unique": false,
+          "index": false,
+          "unmapped": [
+            "UQ (meal_plan_id, day_number, meal_type)"
+          ],
+          "fk": {
+            "table": "meal_types",
+            "column": "code"
+          }
+        },
+        {
+          "name": "name",
+          "type": "TEXT",
+          "nullable": false,
+          "default": "",
+          "pk": false,
+          "unique": false,
+          "index": false,
+          "unmapped": []
+        },
+        {
+          "name": "description",
+          "type": "TEXT",
+          "nullable": true,
+          "default": "",
+          "pk": false,
+          "unique": false,
+          "index": false,
+          "unmapped": []
+        },
+        {
+          "name": "updated_at",
+          "type": "TEXT",
+          "nullable": false,
+          "default": "(strftime('%Y-%m-%dT%H:%M:%fZ','now'))",
+          "pk": false,
+          "unique": false,
+          "index": false,
+          "unmapped": []
+        }
+      ]
+    },
+    "meal_plan_ingredients": {
+      "hash": "d1d24b4bed5ac161",
+      "columns": [
+        {
+          "name": "id",
+          "type": "TEXT",
+          "nullable": false,
+          "default": "",
+          "pk": true,
+          "unique": false,
+          "index": false,
+          "unmapped": []
+        },
+        {
+          "name": "meal_plan_meal_id",
+          "type": "TEXT",
+          "nullable": false,
+          "default": "",
+          "pk": false,
+          "unique": false,
+          "index": true,
+          "unmapped": [],
+          "fk": {
+            "table": "meal_plan_meals",
+            "column": "id"
+          },
+          "onDelete": "cascade"
+        },
+        {
+          "name": "name",
+          "type": "TEXT",
+          "nullable": false,
+          "default": "",
+          "pk": false,
+          "unique": false,
+          "index": false,
+          "unmapped": [
+            "name = lower(trim(name))"
+          ]
+        },
+        {
+          "name": "quantity_g",
+          "type": "REAL",
+          "nullable": true,
+          "default": "",
+          "pk": false,
+          "unique": false,
+          "index": false,
+          "unmapped": [
+            "> 0"
+          ]
+        },
+        {
+          "name": "is_ticked",
+          "type": "INTEGER",
+          "nullable": false,
+          "default": "0",
+          "pk": false,
+          "unique": false,
+          "index": false,
+          "unmapped": [
+            "in (0,1)"
+          ]
+        }
+      ]
+    },
+    "weight_logs": {
+      "hash": "683f2c2512f6a9bc",
+      "columns": [
+        {
+          "name": "id",
+          "type": "TEXT",
+          "nullable": false,
+          "default": "",
+          "pk": true,
+          "unique": false,
+          "index": false,
+          "unmapped": []
+        },
+        {
+          "name": "user_id",
+          "type": "TEXT",
+          "nullable": false,
+          "default": "",
+          "pk": false,
+          "unique": false,
+          "index": false,
+          "unmapped": [],
+          "fk": {
+            "table": "users",
+            "column": "id"
+          },
+          "onDelete": "cascade"
+        },
+        {
+          "name": "log_date",
+          "type": "TEXT",
+          "nullable": false,
+          "default": "",
+          "pk": false,
+          "unique": false,
+          "index": false,
+          "unmapped": [
+            "YYYY-MM-DD"
+          ]
+        },
+        {
+          "name": "weight_kg",
+          "type": "REAL",
+          "nullable": false,
+          "default": "",
+          "pk": false,
+          "unique": false,
+          "index": false,
+          "unmapped": [
+            "> 0"
+          ]
+        },
+        {
+          "name": "created_at",
+          "type": "TEXT",
+          "nullable": false,
+          "default": "(strftime('%Y-%m-%dT%H:%M:%fZ','now'))",
+          "pk": false,
+          "unique": false,
+          "index": false,
+          "unmapped": []
+        }
+      ]
+    },
+    "water_logs": {
+      "hash": "9b6c93ae713f9fa8",
+      "columns": [
+        {
+          "name": "id",
+          "type": "TEXT",
+          "nullable": false,
+          "default": "",
+          "pk": true,
+          "unique": false,
+          "index": false,
+          "unmapped": []
+        },
+        {
+          "name": "user_id",
+          "type": "TEXT",
+          "nullable": false,
+          "default": "",
+          "pk": false,
+          "unique": false,
+          "index": false,
+          "unmapped": [],
+          "fk": {
+            "table": "users",
+            "column": "id"
+          },
+          "onDelete": "cascade"
+        },
+        {
+          "name": "log_date",
+          "type": "TEXT",
+          "nullable": false,
+          "default": "",
+          "pk": false,
+          "unique": false,
+          "index": false,
+          "unmapped": [
+            "YYYY-MM-DD"
+          ]
+        },
+        {
+          "name": "amount_ml",
+          "type": "INTEGER",
+          "nullable": false,
+          "default": "",
+          "pk": false,
+          "unique": false,
+          "index": false,
+          "unmapped": [
+            "> 0"
+          ]
+        },
+        {
+          "name": "created_at",
+          "type": "TEXT",
+          "nullable": false,
+          "default": "(strftime('%Y-%m-%dT%H:%M:%fZ','now'))",
+          "pk": false,
+          "unique": false,
+          "index": false,
+          "unmapped": []
+        }
+      ]
+    },
+    "body_measurements": {
+      "hash": "4dee1f38c9b28b8e",
+      "columns": [
+        {
+          "name": "id",
+          "type": "TEXT",
+          "nullable": false,
+          "default": "",
+          "pk": true,
+          "unique": false,
+          "index": false,
+          "unmapped": []
+        },
+        {
+          "name": "user_id",
+          "type": "TEXT",
+          "nullable": false,
+          "default": "",
+          "pk": false,
+          "unique": false,
+          "index": false,
+          "unmapped": [],
+          "fk": {
+            "table": "users",
+            "column": "id"
+          },
+          "onDelete": "cascade"
+        },
+        {
+          "name": "log_date",
+          "type": "TEXT",
+          "nullable": false,
+          "default": "",
+          "pk": false,
+          "unique": false,
+          "index": false,
+          "unmapped": [
+            "YYYY-MM-DD"
+          ]
+        },
+        {
+          "name": "waist_cm",
+          "type": "REAL",
+          "nullable": true,
+          "default": "",
+          "pk": false,
+          "unique": false,
+          "index": false,
+          "unmapped": [
+            "> 0"
+          ]
+        },
+        {
+          "name": "chest_cm",
+          "type": "REAL",
+          "nullable": true,
+          "default": "",
+          "pk": false,
+          "unique": false,
+          "index": false,
+          "unmapped": [
+            "> 0"
+          ]
+        },
+        {
+          "name": "hips_cm",
+          "type": "REAL",
+          "nullable": true,
+          "default": "",
+          "pk": false,
+          "unique": false,
+          "index": false,
+          "unmapped": [
+            "> 0",
+            "at least one of waist, chest, hips not null"
+          ]
+        },
+        {
+          "name": "created_at",
+          "type": "TEXT",
+          "nullable": false,
+          "default": "(strftime('%Y-%m-%dT%H:%M:%fZ','now'))",
+          "pk": false,
+          "unique": false,
+          "index": false,
+          "unmapped": []
+        }
+      ]
+    },
+    "weekly_reports": {
+      "hash": "3aab11ed4a5361a6",
+      "columns": [
+        {
+          "name": "id",
+          "type": "TEXT",
+          "nullable": false,
+          "default": "",
+          "pk": true,
+          "unique": false,
+          "index": false,
+          "unmapped": []
+        },
+        {
+          "name": "user_id",
+          "type": "TEXT",
+          "nullable": false,
+          "default": "",
+          "pk": false,
+          "unique": false,
+          "index": false,
+          "unmapped": [
+            "UQ (user_id, week_start)"
+          ],
+          "fk": {
+            "table": "users",
+            "column": "id"
+          },
+          "onDelete": "cascade"
+        },
+        {
+          "name": "week_start",
+          "type": "TEXT",
+          "nullable": false,
+          "default": "",
+          "pk": false,
+          "unique": false,
+          "index": false,
+          "unmapped": [
+            "YYYY-MM-DD"
+          ]
+        },
+        {
+          "name": "summary",
+          "type": "TEXT",
+          "nullable": false,
+          "default": "",
+          "pk": false,
+          "unique": false,
+          "index": false,
+          "unmapped": []
+        },
+        {
+          "name": "created_at",
+          "type": "TEXT",
+          "nullable": false,
+          "default": "(strftime('%Y-%m-%dT%H:%M:%fZ','now'))",
+          "pk": false,
+          "unique": false,
+          "index": false,
+          "unmapped": []
+        }
+      ]
+    },
+    "coach_messages": {
+      "hash": "145d276c2045ad19",
+      "columns": [
+        {
+          "name": "id",
+          "type": "TEXT",
+          "nullable": false,
+          "default": "",
+          "pk": true,
+          "unique": false,
+          "index": false,
+          "unmapped": []
+        },
+        {
+          "name": "user_id",
+          "type": "TEXT",
+          "nullable": false,
+          "default": "",
+          "pk": false,
+          "unique": false,
+          "index": false,
+          "unmapped": [],
+          "fk": {
+            "table": "users",
+            "column": "id"
+          },
+          "onDelete": "cascade"
+        },
+        {
+          "name": "role",
+          "type": "TEXT",
+          "nullable": false,
+          "default": "",
+          "pk": false,
+          "unique": false,
+          "index": false,
+          "unmapped": [
+            "in ('user','coach')"
+          ]
+        },
+        {
+          "name": "content",
+          "type": "TEXT",
+          "nullable": false,
+          "default": "",
+          "pk": false,
+          "unique": false,
+          "index": false,
+          "unmapped": []
+        },
+        {
+          "name": "created_at",
+          "type": "TEXT",
+          "nullable": false,
+          "default": "(strftime('%Y-%m-%dT%H:%M:%fZ','now'))",
+          "pk": false,
+          "unique": false,
+          "index": false,
+          "unmapped": []
+        }
+      ]
+    },
+    "checklist_ticks": {
+      "hash": "21fe8be7e560896e",
+      "columns": [
+        {
+          "name": "id",
+          "type": "TEXT",
+          "nullable": false,
+          "default": "",
+          "pk": true,
+          "unique": false,
+          "index": false,
+          "unmapped": []
+        },
+        {
+          "name": "user_id",
+          "type": "TEXT",
+          "nullable": false,
+          "default": "",
+          "pk": false,
+          "unique": false,
+          "index": false,
+          "unmapped": [],
+          "fk": {
+            "table": "users",
+            "column": "id"
+          },
+          "onDelete": "cascade"
+        },
+        {
+          "name": "item_date",
+          "type": "TEXT",
+          "nullable": false,
+          "default": "",
+          "pk": false,
+          "unique": false,
+          "index": false,
+          "unmapped": [
+            "YYYY-MM-DD"
+          ]
+        },
+        {
+          "name": "workout_plan_day_id",
+          "type": "TEXT",
+          "nullable": true,
+          "default": "",
+          "pk": false,
+          "unique": false,
+          "index": false,
+          "unmapped": [],
+          "fk": {
+            "table": "workout_plan_days",
+            "column": "id"
+          },
+          "onDelete": "cascade"
+        },
+        {
+          "name": "meal_plan_meal_id",
+          "type": "TEXT",
+          "nullable": true,
+          "default": "",
+          "pk": false,
+          "unique": false,
+          "index": false,
+          "unmapped": [
+            "exactly one of the two FKs set",
+            "UQ (user_id, item_date, workout_plan_day_id) where workout_plan_day_id is not null",
+            "UQ (user_id, item_date, meal_plan_meal_id) where meal_plan_meal_id is not null"
+          ],
+          "fk": {
+            "table": "meal_plan_meals",
+            "column": "id"
+          },
+          "onDelete": "cascade"
+        },
+        {
+          "name": "created_at",
+          "type": "TEXT",
+          "nullable": false,
+          "default": "(strftime('%Y-%m-%dT%H:%M:%fZ','now'))",
+          "pk": false,
+          "unique": false,
+          "index": false,
+          "unmapped": []
+        }
+      ]
+    },
+    "user_goal_types": {
+      "hash": "52065fd7990fca1e",
+      "columns": [
+        {
+          "name": "code",
+          "type": "TEXT",
+          "nullable": false,
+          "default": "",
+          "pk": true,
+          "unique": false,
+          "index": false,
+          "unmapped": []
+        },
+        {
+          "name": "label",
+          "type": "TEXT",
+          "nullable": false,
+          "default": "",
+          "pk": false,
+          "unique": false,
+          "index": false,
+          "unmapped": []
+        },
+        {
+          "name": "unit",
+          "type": "TEXT",
+          "nullable": false,
+          "default": "",
+          "pk": false,
+          "unique": false,
+          "index": false,
+          "unmapped": []
+        }
+      ]
+    },
+    "user_goals": {
+      "hash": "d5a68326c7bcf538",
+      "columns": [
+        {
+          "name": "id",
+          "type": "TEXT",
+          "nullable": false,
+          "default": "",
+          "pk": true,
+          "unique": false,
+          "index": false,
+          "unmapped": []
+        },
+        {
+          "name": "user_id",
+          "type": "TEXT",
+          "nullable": false,
+          "default": "",
+          "pk": false,
+          "unique": false,
+          "index": true,
+          "unmapped": [],
+          "fk": {
+            "table": "users",
+            "column": "id"
+          },
+          "onDelete": "cascade"
+        },
+        {
+          "name": "goal_type",
+          "type": "TEXT",
+          "nullable": false,
+          "default": "",
+          "pk": false,
+          "unique": false,
+          "index": false,
+          "unmapped": [
+            "UQ (user_id, goal_type)"
+          ],
+          "fk": {
+            "table": "user_goal_types",
+            "column": "code"
+          }
+        },
+        {
+          "name": "target_value",
+          "type": "REAL",
+          "nullable": false,
+          "default": "",
+          "pk": false,
+          "unique": false,
+          "index": false,
+          "unmapped": [
+            "> 0"
+          ]
+        },
+        {
+          "name": "created_at",
+          "type": "TEXT",
+          "nullable": false,
+          "default": "(strftime('%Y-%m-%dT%H:%M:%fZ','now'))",
+          "pk": false,
+          "unique": false,
+          "index": false,
+          "unmapped": []
+        },
+        {
+          "name": "updated_at",
+          "type": "TEXT",
+          "nullable": false,
+          "default": "(strftime('%Y-%m-%dT%H:%M:%fZ','now'))",
+          "pk": false,
+          "unique": false,
+          "index": false,
+          "unmapped": []
+        }
+      ]
+    }
+  },
+  "migrations": [
+    "apps/api/src/db/migrations/0001_db_design.sql"
+  ]
+}

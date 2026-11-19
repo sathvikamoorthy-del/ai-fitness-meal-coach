@@ -14,7 +14,7 @@ Constraints:
 Sources: docs/project/source/01-project-brief.md; docs/project/intent.md; docs/requirements/REQ-404 to REQ-427 (req.md, mock.md)
 Tables: db_design_tables.csv (Status: New = proposed by Claude · Feedback = open feedback to apply or answer · Final = accepted)
 
-`now` below = `strftime('%Y-%m-%dT%H:%M:%fZ','now')`.
+Timestamp defaults are written in full as `(strftime('%Y-%m-%dT%H:%M:%fZ','now'))` (UTC, ISO-8601 with milliseconds).
 
 ## Columns
 ### users
@@ -23,8 +23,8 @@ Tables: db_design_tables.csv (Status: New = proposed by Claude · Feedback = ope
 | id | TEXT | no | | PK | | | UUID |
 | email | TEXT | no | | UQ | yes | COLLATE NOCASE | Sign-in email |
 | password_hash | TEXT | no | | | | | bcrypt hash; password min 8 chars (app) |
-| created_at | TEXT | no | now | | | | |
-| updated_at | TEXT | no | now | | | | |
+| created_at | TEXT | no | (strftime('%Y-%m-%dT%H:%M:%fZ','now')) | | | | |
+| updated_at | TEXT | no | (strftime('%Y-%m-%dT%H:%M:%fZ','now')) | | | | |
 
 ### sessions
 | Column | Type | Null | Default | Key / FK | Index | Constraints | Description |
@@ -32,7 +32,7 @@ Tables: db_design_tables.csv (Status: New = proposed by Claude · Feedback = ope
 | id | TEXT | no | | PK | | | Session token id |
 | user_id | TEXT | no | | FK -> users.id | yes | on delete cascade | |
 | expires_at | TEXT | no | | | yes | | Session ends at this time |
-| created_at | TEXT | no | now | | | | |
+| created_at | TEXT | no | (strftime('%Y-%m-%dT%H:%M:%fZ','now')) | | | | |
 
 ### goal_types
 | Column | Type | Null | Default | Key / FK | Index | Constraints | Description |
@@ -65,8 +65,8 @@ Tables: db_design_tables.csv (Status: New = proposed by Claude · Feedback = ope
 | diet_type | TEXT | yes | | FK -> diet_types.code | | | Vegetarian or not |
 | daily_calorie_target | REAL | yes | | | | > 0 | Mifflin-St Jeor x 1.4; -500 lose, +300 gain; set on save; used by daily summary |
 | daily_water_target_ml | INTEGER | no | 2000 | | | > 0 | Daily water target |
-| created_at | TEXT | no | now | | | | |
-| updated_at | TEXT | no | now | | | | |
+| created_at | TEXT | no | (strftime('%Y-%m-%dT%H:%M:%fZ','now')) | | | | |
+| updated_at | TEXT | no | (strftime('%Y-%m-%dT%H:%M:%fZ','now')) | | | | |
 
 ### user_allergies
 | Column | Type | Null | Default | Key / FK | Index | Constraints | Description |
@@ -74,15 +74,15 @@ Tables: db_design_tables.csv (Status: New = proposed by Claude · Feedback = ope
 | id | TEXT | no | | PK | | | |
 | user_id | TEXT | no | | FK -> users.id | yes | on delete cascade | |
 | name | TEXT | no | | | | UQ (user_id, name) | Allergy |
-| created_at | TEXT | no | now | | | | |
+| created_at | TEXT | no | (strftime('%Y-%m-%dT%H:%M:%fZ','now')) | | | | |
 
 ### exercises
 | Column | Type | Null | Default | Key / FK | Index | Constraints | Description |
 |---|---|---|---|---|---|---|---|
 | id | TEXT | no | | PK | | | |
 | name | TEXT | no | | UQ | yes | COLLATE NOCASE | Searched by name; seeded (~40) |
-| created_at | TEXT | no | now | | | | |
-| updated_at | TEXT | no | now | | | | |
+| created_at | TEXT | no | (strftime('%Y-%m-%dT%H:%M:%fZ','now')) | | | | |
+| updated_at | TEXT | no | (strftime('%Y-%m-%dT%H:%M:%fZ','now')) | | | | |
 
 ### plan_sources
 | Column | Type | Null | Default | Key / FK | Index | Constraints | Description |
@@ -97,8 +97,8 @@ Tables: db_design_tables.csv (Status: New = proposed by Claude · Feedback = ope
 | user_id | TEXT | no | | FK -> users.id | yes | on delete cascade | |
 | source | TEXT | no | | FK -> plan_sources.code | | | AI or user-built |
 | is_active | INTEGER | no | 0 | | | in (0,1); UQ (user_id) where is_active = 1 | One active plan per user |
-| created_at | TEXT | no | now | | | | |
-| updated_at | TEXT | no | now | | | | |
+| created_at | TEXT | no | (strftime('%Y-%m-%dT%H:%M:%fZ','now')) | | | | |
+| updated_at | TEXT | no | (strftime('%Y-%m-%dT%H:%M:%fZ','now')) | | | | |
 
 ### workout_plan_days
 | Column | Type | Null | Default | Key / FK | Index | Constraints | Description |
@@ -123,8 +123,8 @@ Tables: db_design_tables.csv (Status: New = proposed by Claude · Feedback = ope
 | id | TEXT | no | | PK | | | |
 | user_id | TEXT | no | | FK -> users.id | (user_id, session_date) | on delete cascade | |
 | session_date | TEXT | no | | | | YYYY-MM-DD | |
-| created_at | TEXT | no | now | | | | |
-| updated_at | TEXT | no | now | | | | |
+| created_at | TEXT | no | (strftime('%Y-%m-%dT%H:%M:%fZ','now')) | | | | |
+| updated_at | TEXT | no | (strftime('%Y-%m-%dT%H:%M:%fZ','now')) | | | | |
 
 ### workout_session_exercises
 | Column | Type | Null | Default | Key / FK | Index | Constraints | Description |
@@ -146,8 +146,8 @@ Tables: db_design_tables.csv (Status: New = proposed by Claude · Feedback = ope
 | protein_g | REAL | no | | | | >= 0 | Per 100 g |
 | carbs_g | REAL | no | | | | >= 0 | Per 100 g |
 | fat_g | REAL | no | | | | >= 0 | Per 100 g |
-| created_at | TEXT | no | now | | | | |
-| updated_at | TEXT | no | now | | | | |
+| created_at | TEXT | no | (strftime('%Y-%m-%dT%H:%M:%fZ','now')) | | | | |
+| updated_at | TEXT | no | (strftime('%Y-%m-%dT%H:%M:%fZ','now')) | | | | |
 
 ### meal_types
 | Column | Type | Null | Default | Key / FK | Index | Constraints | Description |
@@ -162,8 +162,8 @@ Tables: db_design_tables.csv (Status: New = proposed by Claude · Feedback = ope
 | user_id | TEXT | no | | FK -> users.id | (user_id, log_date) | on delete cascade | |
 | log_date | TEXT | no | | | | YYYY-MM-DD | |
 | meal_type | TEXT | no | | FK -> meal_types.code | | | |
-| created_at | TEXT | no | now | | | | |
-| updated_at | TEXT | no | now | | | | |
+| created_at | TEXT | no | (strftime('%Y-%m-%dT%H:%M:%fZ','now')) | | | | |
+| updated_at | TEXT | no | (strftime('%Y-%m-%dT%H:%M:%fZ','now')) | | | | |
 
 ### meal_log_items
 | Column | Type | Null | Default | Key / FK | Index | Constraints | Description |
@@ -179,8 +179,8 @@ Tables: db_design_tables.csv (Status: New = proposed by Claude · Feedback = ope
 | id | TEXT | no | | PK | | | |
 | user_id | TEXT | no | | FK -> users.id | yes | on delete cascade | |
 | period | TEXT | no | | | | in ('day','week') | Chosen by user when asking |
-| created_at | TEXT | no | now | | | | |
-| updated_at | TEXT | no | now | | | | |
+| created_at | TEXT | no | (strftime('%Y-%m-%dT%H:%M:%fZ','now')) | | | | |
+| updated_at | TEXT | no | (strftime('%Y-%m-%dT%H:%M:%fZ','now')) | | | | |
 
 ### meal_plan_meals
 | Column | Type | Null | Default | Key / FK | Index | Constraints | Description |
@@ -191,7 +191,7 @@ Tables: db_design_tables.csv (Status: New = proposed by Claude · Feedback = ope
 | meal_type | TEXT | no | | FK -> meal_types.code | | UQ (meal_plan_id, day_number, meal_type) | |
 | name | TEXT | no | | | | | Meal name |
 | description | TEXT | yes | | | | | |
-| updated_at | TEXT | no | now | | | | Changes on swap |
+| updated_at | TEXT | no | (strftime('%Y-%m-%dT%H:%M:%fZ','now')) | | | | Changes on swap |
 
 ### meal_plan_ingredients
 | Column | Type | Null | Default | Key / FK | Index | Constraints | Description |
@@ -209,7 +209,7 @@ Tables: db_design_tables.csv (Status: New = proposed by Claude · Feedback = ope
 | user_id | TEXT | no | | FK -> users.id | (user_id, log_date) | on delete cascade | |
 | log_date | TEXT | no | | | | YYYY-MM-DD | |
 | weight_kg | REAL | no | | | | > 0 | Also written to profiles.weight_kg |
-| created_at | TEXT | no | now | | | | |
+| created_at | TEXT | no | (strftime('%Y-%m-%dT%H:%M:%fZ','now')) | | | | |
 
 ### water_logs
 | Column | Type | Null | Default | Key / FK | Index | Constraints | Description |
@@ -218,7 +218,7 @@ Tables: db_design_tables.csv (Status: New = proposed by Claude · Feedback = ope
 | user_id | TEXT | no | | FK -> users.id | (user_id, log_date) | on delete cascade | |
 | log_date | TEXT | no | | | | YYYY-MM-DD | |
 | amount_ml | INTEGER | no | | | | > 0 | Summed per day |
-| created_at | TEXT | no | now | | | | |
+| created_at | TEXT | no | (strftime('%Y-%m-%dT%H:%M:%fZ','now')) | | | | |
 
 ### body_measurements
 | Column | Type | Null | Default | Key / FK | Index | Constraints | Description |
@@ -229,7 +229,7 @@ Tables: db_design_tables.csv (Status: New = proposed by Claude · Feedback = ope
 | waist_cm | REAL | yes | | | | > 0 | |
 | chest_cm | REAL | yes | | | | > 0 | |
 | hips_cm | REAL | yes | | | | > 0; at least one of waist, chest, hips not null | |
-| created_at | TEXT | no | now | | | | |
+| created_at | TEXT | no | (strftime('%Y-%m-%dT%H:%M:%fZ','now')) | | | | |
 
 ### weekly_reports
 | Column | Type | Null | Default | Key / FK | Index | Constraints | Description |
@@ -238,7 +238,7 @@ Tables: db_design_tables.csv (Status: New = proposed by Claude · Feedback = ope
 | user_id | TEXT | no | | FK -> users.id | | on delete cascade; UQ (user_id, week_start) | |
 | week_start | TEXT | no | | | | YYYY-MM-DD | First day of week |
 | summary | TEXT | no | | | | | AI text, generated on request |
-| created_at | TEXT | no | now | | | | |
+| created_at | TEXT | no | (strftime('%Y-%m-%dT%H:%M:%fZ','now')) | | | | |
 
 ### coach_messages
 | Column | Type | Null | Default | Key / FK | Index | Constraints | Description |
@@ -247,7 +247,7 @@ Tables: db_design_tables.csv (Status: New = proposed by Claude · Feedback = ope
 | user_id | TEXT | no | | FK -> users.id | (user_id, created_at) | on delete cascade | |
 | role | TEXT | no | | | | in ('user','coach') | Sender |
 | content | TEXT | no | | | | | Message text |
-| created_at | TEXT | no | now | | | | Order of chat |
+| created_at | TEXT | no | (strftime('%Y-%m-%dT%H:%M:%fZ','now')) | | | | Order of chat |
 
 ### checklist_ticks
 | Column | Type | Null | Default | Key / FK | Index | Constraints | Description |
@@ -256,8 +256,8 @@ Tables: db_design_tables.csv (Status: New = proposed by Claude · Feedback = ope
 | user_id | TEXT | no | | FK -> users.id | (user_id, item_date) | on delete cascade | |
 | item_date | TEXT | no | | | | YYYY-MM-DD | Today's date |
 | workout_plan_day_id | TEXT | yes | | FK -> workout_plan_days.id | | on delete cascade | Ticked workout |
-| meal_plan_meal_id | TEXT | yes | | FK -> meal_plan_meals.id | | on delete cascade; exactly one of the two FKs set; UQ (user_id, item_date, workout_plan_day_id, meal_plan_meal_id) | Ticked meal; no log created |
-| created_at | TEXT | no | now | | | | |
+| meal_plan_meal_id | TEXT | yes | | FK -> meal_plan_meals.id | | on delete cascade; exactly one of the two FKs set; UQ (user_id, item_date, workout_plan_day_id) where workout_plan_day_id is not null; UQ (user_id, item_date, meal_plan_meal_id) where meal_plan_meal_id is not null | Ticked meal; no log created. Two partial UQs because SQLite treats NULLs as distinct (a 4-column UQ would never block a duplicate) |
+| created_at | TEXT | no | (strftime('%Y-%m-%dT%H:%M:%fZ','now')) | | | | |
 
 ### user_goal_types
 | Column | Type | Null | Default | Key / FK | Index | Constraints | Description |
@@ -273,5 +273,5 @@ Tables: db_design_tables.csv (Status: New = proposed by Claude · Feedback = ope
 | user_id | TEXT | no | | FK -> users.id | yes | on delete cascade | |
 | goal_type | TEXT | no | | FK -> user_goal_types.code | | UQ (user_id, goal_type) | |
 | target_value | REAL | no | | | | > 0 | In the type's unit |
-| created_at | TEXT | no | now | | | | |
-| updated_at | TEXT | no | now | | | | |
+| created_at | TEXT | no | (strftime('%Y-%m-%dT%H:%M:%fZ','now')) | | | | |
+| updated_at | TEXT | no | (strftime('%Y-%m-%dT%H:%M:%fZ','now')) | | | | |

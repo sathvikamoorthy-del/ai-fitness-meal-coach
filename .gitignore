@@ -6,3 +6,4 @@ dist
 coverage
 .env
 apps/api/data/
+apps/api/backups/
