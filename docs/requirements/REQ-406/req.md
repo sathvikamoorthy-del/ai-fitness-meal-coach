@@ -21,6 +21,7 @@ The AI plans and calorie targets are built from the profile and goal (G1).
   - Base (Mifflin-St Jeor): 10 × weight (kg) + 6.25 × height (cm) − 5 × age (years), then +5 for male or −161 for female.
   - Multiply the base by 1.4.
   - Lose weight: subtract 500. Gain weight: add 300. Maintain weight: no change.
+  - Round the result to the nearest whole kcal. The rounded value is the one saved and shown.
   - After saving, the target is shown on the profile in kcal. The daily calorie summary (REQ-418) only reads this value.
 - **When the target changes.** The target is worked out again only when the profile is saved. A weight logged later (REQ-419) updates the profile weight but does not recalculate the target.
 - **Daily water target.** Every profile has a daily water target of 2,000 ml by default, stored as `profiles.daily_water_target_ml`. In this version it is not shown or editable on the profile.
@@ -32,7 +33,7 @@ The AI plans and calorie targets are built from the profile and goal (G1).
 - Saving with any of the six fields empty is refused, and the message names the missing field.
 - Age outside 13 to 100, height outside 100 to 250 cm, or weight outside 30 to 300 kg is refused, and the message names the field and its range.
 - Only metric units are accepted and shown; there is no unit choice.
-- On save, the daily calorie target is computed with the formula above and stored in `profiles.daily_calorie_target`. Example: female, 32 years, 163 cm, 68.4 kg, lose weight gives 1,934.45 − 500 = 1,434.45 kcal.
+- On save, the daily calorie target is computed with the formula above and stored in `profiles.daily_calorie_target`, rounded to the nearest whole kcal. Example: female, 32 years, 163 cm, 68.4 kg, lose weight gives 1,934.45 − 500 = 1,434.45, saved and shown as 1,434 kcal.
 - After saving, the profile shows the daily calorie target.
 - Saving again with changed values recomputes the target.
 - Logging a new weight (REQ-419) changes the profile weight but not the stored target.
@@ -50,7 +51,7 @@ Goal served: G1
 - **Fitness level:** on the profile; beginner, intermediate or advanced; required.
 - **Allowed ranges:** age 13–100, height 100–250 cm, weight 30–300 kg; values outside are refused with a clear message.
 - **Sex:** asked on the profile, female or male, required (calorie formula input).
-- **Daily calorie target:** owned by REQ-406; Mifflin-St Jeor × 1.4, −500 lose, +300 gain, unchanged for maintain; computed on save, shown after saving, stored as `profiles.daily_calorie_target`; REQ-418 only reads it.
+- **Daily calorie target:** owned by REQ-406; Mifflin-St Jeor × 1.4, −500 lose, +300 gain, unchanged for maintain; rounded to the nearest whole kcal; computed on save, shown after saving, stored as `profiles.daily_calorie_target`; REQ-418 only reads it.
 - **Daily water target:** 2,000 ml default in `profiles.daily_water_target_ml`; not shown or editable on the profile in this version.
 - **Complete profile:** all six fields filled; diet and allergies do not count.
 - **Weight logged later:** updates the profile weight, does not recalculate the target; only saving the profile does.
