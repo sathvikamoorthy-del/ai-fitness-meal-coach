@@ -8,7 +8,7 @@ Checks every acceptance criterion of REQ-404, plus the failure and edge cases in
 ## Setup
 - **API tests:** `apps/api/tests/routes/auth.test.ts` with the in-memory app and database from `src/testing/testUtils.ts` (`:memory:`). Migration `0001_db_design.sql` is applied.
 - **Web tests:** the `SignInPage` tests in `apps/web`, with the API mocked.
-- **Restart test (S14):** the API running with `DATABASE_URL` = a Turso `libsql://` URL and `DATABASE_AUTH_TOKEN` set. `JWT_SECRET` must be at least 32 characters. Any host works, because none is chosen.
+- **Restart test (S18):** the API running with `DATABASE_URL` = a Turso `libsql://` URL and `DATABASE_AUTH_TOKEN` set. `JWT_SECRET` must be at least 32 characters. Any host works, because none is chosen.
 - **Profile fixtures** (for S8, S9, S10):
   - no `profiles` row;
   - a row with 5 of the 6 required fields, leaving `fitness_level` null;
