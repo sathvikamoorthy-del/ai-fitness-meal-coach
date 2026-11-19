@@ -4,7 +4,9 @@
 import React, { FormEvent, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Alert, AlertDescription, AlertTitle, Box, Button, FormControl, FormHelperText, FormLabel, Heading, HStack, Input, Stack, Text } from '@chakra-ui/react';
-import { setToken } from '../../state/authStore';
+import { setToken, useAuthStore } from '../../state/authStore';
+
+export const SESSION_EXPIRED_MESSAGE = 'Session expired, please sign in again.';
 
 export const MIN_PASSWORD_LENGTH = 8;
 
@@ -32,6 +34,7 @@ export function SignInPage() {
   const [error, setError] = useState<string | null>(null);
   const [created, setCreated] = useState(false);
   const [busy, setBusy] = useState(false);
+  const notice = useAuthStore((s) => s.notice);   // REQ-405: why the user is back here (cleared by a successful sign-in)
 
   const run = async (action: () => Promise<void>) => {
     setBusy(true);
@@ -63,6 +66,11 @@ export function SignInPage() {
       <Heading as="h1" size="lg" mb={6}>AI Fitness &amp; Meal Coach</Heading>
       <form onSubmit={onSignIn} noValidate>
         <Stack spacing={4}>
+          {notice === 'session-expired' && !created && (
+            <Alert status="info">
+              <AlertDescription>{SESSION_EXPIRED_MESSAGE}</AlertDescription>
+            </Alert>
+          )}
           {created && (
             <Alert status="success" flexDirection="column" alignItems="flex-start">
               <AlertTitle>Account created</AlertTitle>

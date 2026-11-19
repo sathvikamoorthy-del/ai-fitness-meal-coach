@@ -10,6 +10,8 @@ import { createDb, Db } from '../../src/db/client';
 import { migrate } from '../../src/db/migrate';
 import { ormProvider } from '../../src/db/orm';
 import { verifyToken } from '../../src/auth/jwt';
+import { authenticate } from '../../src/auth/authMiddleware';
+import { sessionCheck } from '../../src/auth/sessionCheck';
 import { withEnv } from '../../src/testing/testUtils';
 
 const SECRET = 'test-secret-that-is-at-least-32-characters-long';
@@ -39,7 +41,7 @@ describe('auth routes', () => {
     await db.execute("INSERT INTO fitness_levels (code, label) VALUES ('beginner', 'Beginner')");
     const app = createApp({
       routes: [authRoute],
-      middleware: [],
+      middleware: [{ id: 'jwt-auth', handler: authenticate as any }, { id: 'session-check', handler: sessionCheck }],
       providers: [
         { id: 'test-db', register: (a: Express) => { a.set('db', db); } },
         { id: 'orm', register: (a: Express) => { ormProvider(a); } }
@@ -159,6 +161,60 @@ describe('auth routes', () => {
       expect(res).toEqual({ status: 500, body: { error: 'auth-misconfigured' } });
       const [{ n: after }] = await rows('SELECT COUNT(*) AS n FROM sessions');
       expect(after).toBe(before);
+    });
+  });
+
+  describe('sign-out (REQ-405)', () => {
+    const signOut = async (token?: string) => {
+      const res = await fetch(`${base}/auth/signout`, { method: 'POST', headers: token ? { authorization: `Bearer ${token}` } : {} });
+      const text = await res.text();
+      return { status: res.status, body: text ? JSON.parse(text) : null };
+    };
+    const sidOf = async (token: string) => String((await verifyToken(token)).claims.sid);
+
+    beforeAll(async () => {
+      await signUp('dana@example.com', 'dana-password');
+    });
+
+    it('ends the current session: 204, the row is gone, and the old token is refused', async () => {
+      const { token } = (await signIn('dana@example.com', 'dana-password')).body;
+      const sid = await sidOf(token);
+      expect(await signOut(token)).toEqual({ status: 204, body: null });
+      expect(await rows('SELECT id FROM sessions WHERE id = ?', [sid])).toHaveLength(0);
+      expect(await signOut(token)).toEqual({ status: 401, body: { error: 'session-ended' } });   // second sign-out, same token
+    });
+
+    it('refuses sign-out without a token', async () => {
+      expect(await signOut()).toEqual({ status: 401, body: { error: 'unauthorized' } });
+    });
+
+    it("leaves the same user's other sessions working", async () => {
+      const a = (await signIn('dana@example.com', 'dana-password')).body.token;
+      const b = (await signIn('dana@example.com', 'dana-password')).body.token;
+      expect((await signOut(a)).status).toBe(204);
+      expect(await rows('SELECT id FROM sessions WHERE id = ?', [await sidOf(b)])).toHaveLength(1);
+      expect((await signOut(b)).status).toBe(204);
+    });
+
+    it('does not extend expires_at when the session is used', async () => {
+      const { token } = (await signIn('dana@example.com', 'dana-password')).body;
+      const sid = await sidOf(token);
+      const [before] = await rows('SELECT expires_at FROM sessions WHERE id = ?', [sid]);
+      await new Promise((r) => setTimeout(r, 20));
+      await signIn('dana@example.com', 'dana-password');   // other activity of the same user
+      const [after] = await rows('SELECT expires_at FROM sessions WHERE id = ?', [sid]);
+      expect(after.expires_at).toBe(before.expires_at);
+      expect((await signOut(token)).status).toBe(204);     // the session is still the same, valid one
+    });
+
+    it("removes the user's expired sessions at sign-in and starts a new 7-day session", async () => {
+      const [user] = await rows("SELECT id FROM users WHERE email = 'dana@example.com'");
+      await db.execute({ sql: 'INSERT INTO sessions (id, user_id, expires_at) VALUES (?, ?, ?)', args: ['old-dana', user.id, new Date(Date.now() - 1000).toISOString()] });
+      const before = Date.now();
+      const { token } = (await signIn('dana@example.com', 'dana-password')).body;
+      expect(await rows("SELECT id FROM sessions WHERE id = 'old-dana'")).toHaveLength(0);
+      const [row] = await rows('SELECT expires_at FROM sessions WHERE id = ?', [await sidOf(token)]);
+      expect(Date.parse(String(row.expires_at))).toBeGreaterThanOrEqual(before + 7 * 24 * 60 * 60 * 1000);
     });
   });
 

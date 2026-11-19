@@ -1,11 +1,11 @@
 import React from 'react';
-import { fireEvent, screen, waitFor } from '@testing-library/react';
+import { act, fireEvent, screen, waitFor } from '@testing-library/react';
 import { Route, Routes } from 'react-router-dom';
 import { renderApp } from '../../../src/testing/render';
 import { SignInPage } from '../../../src/features/auth/SignInPage';
 import { RequireAuth } from '../../../src/features/auth/RequireAuth';
 import { router } from '../../../src/app/router';
-import { useAuthStore } from '../../../src/state/authStore';
+import { expireSession, useAuthStore } from '../../../src/state/authStore';
 
 const fakeToken = (exp: number) => `h.${btoa(JSON.stringify({ sub: 'u1', sid: 's1', exp }))}.sig`;
 const validToken = () => fakeToken(Math.floor(Date.now() / 1000) + 3600);
@@ -141,6 +141,53 @@ describe('RequireAuth', () => {
     renderAt('/profile');
     expect(screen.getByRole('button', { name: 'Sign in' })).toBeInTheDocument();
     await waitFor(() => expect(useAuthStore.getState().token).toBeNull());
+  });
+});
+
+describe('Session expired notice (REQ-405)', () => {
+  const EXPIRED = 'Session expired, please sign in again.';
+
+  it('shows the notice on the sign-in screen after the session expired', () => {
+    expireSession();
+    renderAt();
+    expect(screen.getByText(EXPIRED)).toBeInTheDocument();
+  });
+
+  it('does not show the notice after a plain visit or sign-out', () => {
+    renderAt();
+    expect(screen.queryByText(EXPIRED)).not.toBeInTheDocument();
+  });
+
+  it('a successful sign-in clears the notice', async () => {
+    expireSession();
+    reply({ status: 200, body: { token: validToken(), profileComplete: true } });
+    renderAt();
+    fill('ann@example.com', 'secret-pass');
+    click('Sign in');
+    expect(await screen.findByText('Today page')).toBeInTheDocument();
+    expect(useAuthStore.getState().notice).toBeNull();
+  });
+
+  it('opening a signed-in page with an expired token lands on sign-in with the notice', async () => {
+    useAuthStore.setState({ token: fakeToken(Math.floor(Date.now() / 1000) - 10) });
+    renderAt('/today');
+    expect(await screen.findByText(EXPIRED)).toBeInTheDocument();
+    expect(useAuthStore.getState()).toMatchObject({ token: null, notice: 'session-expired' });
+  });
+
+  it('when the 7 days end while the user stays on the page, the timer sends them to sign-in with the notice', () => {
+    jest.useFakeTimers();
+    try {
+      useAuthStore.setState({ token: fakeToken(Math.floor(Date.now() / 1000) + 60) });
+      renderAt('/today');
+      expect(screen.getByText('Today page')).toBeInTheDocument();
+      act(() => { jest.advanceTimersByTime(61_000); });
+      expect(screen.getByText(EXPIRED)).toBeInTheDocument();
+      expect(screen.queryByText('Today page')).not.toBeInTheDocument();
+      expect(useAuthStore.getState().notice).toBe('session-expired');
+    } finally {
+      jest.useRealTimers();
+    }
   });
 });
 

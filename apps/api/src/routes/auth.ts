@@ -1,17 +1,20 @@
 // Sign-up and sign-in with email and password (REQ-404, WI-045).
 //   POST /auth/signup {email, password} -> 201 {ok: true}; 400 invalid-email | password-too-short; 409 email-taken
 //   POST /auth/signin {email, password} -> 200 {token, profileComplete}; 400 invalid-email; 401 invalid-credentials
+//   POST /auth/signout (Bearer token)   -> 204, ends the current session (REQ-405, WI-046); 401 when not signed in
 // The browser calls these as /api/auth/... (the proxy strips /api, as for /health). Sign-up never signs the user in.
 // Passwords are stored only as bcrypt hashes and are never logged.
 import crypto from 'crypto';
 import bcrypt from 'bcryptjs';
-import { eq } from 'drizzle-orm';
+import { and, eq, lte } from 'drizzle-orm';
 import { Request, Response, Router } from 'express';
 import { RouteEntry, wrapAsync } from '../http/app';
 import type { Orm } from '../db/orm';
 import { users } from '../db/models/users';
 import { sessions } from '../db/models/sessions';
 import { AuthConfigError } from '../auth/jwt';
+import { requireAuth } from '../auth/authMiddleware';
+import { SessionReq } from '../auth/sessionCheck';
 import { SESSION_LENGTH_MS, signSessionToken } from '../auth/sessionToken';
 import { isProfileComplete } from '../auth/profileStatus';
 
@@ -85,8 +88,19 @@ async function signIn(req: Request, res: Response) {
     if (err instanceof AuthConfigError) return void res.status(500).json({ error: 'auth-misconfigured' });
     throw err;
   }
+  // Housekeeping (WI-046): the user's expired sessions can never be used again, so remove them now.
+  await orm.delete(sessions).where(and(eq(sessions.user_id, user.id), lte(sessions.expires_at, new Date().toISOString())));
   await orm.insert(sessions).values({ id: sessionId, user_id: user.id, expires_at: expiresAt.toISOString() });
   res.json({ token, profileComplete: await isProfileComplete(orm, user.id) });
+}
+
+// Ends the current session only (other browsers of the same user keep theirs). `sessionCheck` has already confirmed the
+// session exists and has not expired, and set req.sessionId; a second sign-out with the same token gets 401 session-ended.
+async function signOut(req: Request, res: Response) {
+  const sessionId = (req as SessionReq).sessionId;
+  if (!sessionId) return void res.status(401).json({ error: 'unauthorized' });
+  await ormOf(req).delete(sessions).where(eq(sessions.id, sessionId));
+  res.status(204).end();
 }
 
 export const authRoute: RouteEntry = {
@@ -94,5 +108,6 @@ export const authRoute: RouteEntry = {
   mount: (router: Router) => {
     router.post('/auth/signup', wrapAsync(signUp));
     router.post('/auth/signin', wrapAsync(signIn));
+    router.post('/auth/signout', requireAuth, wrapAsync(signOut));
   }
 };
