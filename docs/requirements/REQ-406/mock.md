@@ -19,7 +19,8 @@ Profile screen after saving. All six fields are required; units are fixed (cm, k
 |                              [ Save ]     |
 |------------------------------------------|
 | Daily calorie target        1,434 kcal    |
-| (worked out when the profile is saved)    |
+| (worked out when the profile is saved;    |
+|  1,434.45 rounded to the nearest kcal)    |
 +------------------------------------------+
 ```
 
@@ -41,7 +42,8 @@ Flow:
 Save --(field missing or out of range)--> refused, message per field
   |
   v
-profile saved --> calorie target = (Mifflin-St Jeor x 1.4) -500 lose / +300 gain / 0 maintain
+profile saved --> calorie target = (Mifflin-St Jeor x 1.4) -500 lose / +300 gain / 0 maintain,
+  |               rounded to the nearest whole kcal
   |
   v
 target shown on profile; read by daily summary (REQ-418)
