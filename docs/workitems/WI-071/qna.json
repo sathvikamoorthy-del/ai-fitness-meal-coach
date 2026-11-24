@@ -2,7 +2,7 @@
   "entity_type": "workItem",
   "entity_id": "WI-071",
   "assigned_to": "EackSUlFzsWHlVljpQWgdDETfhs1",
-  "status": "pending",
+  "status": "completed",
   "questions": [
     {
       "id": "q1",
@@ -15,9 +15,10 @@
       ],
       "reason": "REQ-407 says the values are 'saved with the profile', and its mock shows its own Save button, while the REQ-406 Profile page saves its six required fields together. The answer decides the screen layout and whether diet and allergies use the profile endpoint or their own.",
       "required": true,
-      "answer": null,
-      "answered_by": null,
-      "answered_at": null
+      "answer": "On the Profile screen, as a separate section below the six profile fields, with its own Save button (as in mock.md)",
+      "answered_by": "EackSUlFzsWHlVljpQWgdDETfhs1",
+      "answered_at": "2026-11-24T10:28:49.000Z",
+      "other": null
     },
     {
       "id": "q2",
@@ -30,9 +31,10 @@
       ],
       "reason": "REQ-407 only says the user 'can choose'. REQ-406 says diet does not count for a complete profile, and profiles.diet_type allows empty. Whether it can be left empty or cleared changes validation and the form.",
       "required": true,
-      "answer": null,
-      "answered_by": null,
-      "answered_at": null
+      "answer": "Optional: it can be left unset, and the user can clear it again",
+      "answered_by": "EackSUlFzsWHlVljpQWgdDETfhs1",
+      "answered_at": "2026-11-24T10:28:49.000Z",
+      "other": null
     },
     {
       "id": "q3",
@@ -45,9 +47,10 @@
       ],
       "reason": "The DB design stores one free-text row per allergy with UNIQUE (user_id, name), but does not say whether 'Peanuts' and ' peanuts' are the same allergy. Meal plans (REQ-413) will match on these names.",
       "required": true,
-      "answer": null,
-      "answered_by": null,
-      "answered_at": null
+      "answer": "Trim spaces at both ends, keep the user's spelling, and refuse a duplicate ignoring letter case ('Peanuts' = 'peanuts')",
+      "answered_by": "EackSUlFzsWHlVljpQWgdDETfhs1",
+      "answered_at": "2026-11-24T10:28:49.000Z",
+      "other": null
     },
     {
       "id": "q4",
@@ -60,9 +63,10 @@
       ],
       "reason": "Neither REQ-407 nor the DB design sets a maximum name length or number of allergies; the API needs a rule to validate against.",
       "required": true,
-      "answer": null,
-      "answered_by": null,
-      "answered_at": null
+      "answer": "Name 1 to 50 characters; at most 20 allergies per user",
+      "answered_by": "EackSUlFzsWHlVljpQWgdDETfhs1",
+      "answered_at": "2026-11-24T10:28:49.000Z",
+      "other": null
     }
   ]
 }
