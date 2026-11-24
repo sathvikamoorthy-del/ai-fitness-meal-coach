@@ -123,7 +123,7 @@ describe('profile routes', () => {
 
   it('keeps diet_type and the water target when the profile is saved again', async () => {
     const { userId, token } = await newUser();
-    await db.execute({ sql: "INSERT INTO diet_types (code, label) VALUES ('vegetarian', 'Vegetarian')", args: [] });
+    // diet_types 'vegetarian' comes from the seed migration 0003_seed_diet_types.sql (WI-071)
     await db.execute({ sql: "INSERT INTO profiles (user_id, diet_type, daily_water_target_ml) VALUES (?, 'vegetarian', 2500)", args: [userId] });
     expect((await call('PUT', token, valid)).status).toBe(200);
     const [row] = await rows('SELECT diet_type, daily_water_target_ml, age FROM profiles WHERE user_id = ?', [userId]);

@@ -12,9 +12,14 @@ const validToken = () => `h.${btoa(JSON.stringify({ sub: 'u1', sid: 's1', exp: M
 const saved = { age: 32, sex: 'female', heightCm: 163, weightKg: 68.4, goal: 'lose', fitnessLevel: 'beginner', dailyCalorieTarget: 1434 };
 const TOO_LOW = 'This goal gives a calorie target that is too low; choose maintain or gain weight.';
 
+// The page also loads the diet section (WI-071), so the mock answers by URL: /api/profile/diet always answers an empty
+// diet, and /api/profile takes the queued replies of each test in order.
 let fetchMock: jest.Mock;
+let profileReplies: (() => Promise<unknown>)[];
 const reply = (status: number, body?: unknown) =>
-  fetchMock.mockResolvedValueOnce({ status, json: async () => { if (body === undefined) throw new Error('no body'); return body; } });
+  profileReplies.push(async () => ({ status, json: async () => { if (body === undefined) throw new Error('no body'); return body; } }));
+const replyError = (err: Error) => profileReplies.push(async () => { throw err; });
+const profileCalls = () => fetchMock.mock.calls.filter((c) => c[0] === '/api/profile');
 
 const renderProfile = () => renderApp(
   <Routes>
@@ -34,7 +39,13 @@ const fillValid = () => {
 const putBody = () => JSON.parse(fetchMock.mock.calls.find((c) => c[1]?.method === 'PUT')[1].body);
 
 beforeEach(() => {
-  fetchMock = jest.fn();
+  profileReplies = [];
+  fetchMock = jest.fn(async (url: string) => {
+    if (url === '/api/profile/diet') return { status: 200, json: async () => ({ diet: null, allergies: [] }) };
+    const next = profileReplies.shift();
+    if (!next) throw new Error(`no reply queued for ${url}`);
+    return next();
+  });
   (global as any).fetch = fetchMock;
   useAuthStore.getState().reset();
   setToken(validToken());
@@ -80,7 +91,7 @@ describe('ProfilePage', () => {
     for (const m of ['Age is required.', 'Sex is required.', 'Weight is required.', 'Goal is required.', 'Fitness level is required.']) {
       expect(screen.getByText(m)).toBeInTheDocument();
     }
-    expect(fetchMock).toHaveBeenCalledTimes(1);              // only the initial GET
+    expect(profileCalls()).toHaveLength(1);                  // only the initial GET
   });
 
   it('saves numbers as numbers and shows the new target', async () => {
@@ -132,9 +143,9 @@ describe('ProfilePage', () => {
     renderProfile();
     expect(await screen.findByRole('alert')).toHaveTextContent('Something went wrong. Please try again.');
     fillValid();
-    fetchMock.mockRejectedValueOnce(new Error('offline'));
+    replyError(new Error('offline'));
     save();
-    await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(2));
+    await waitFor(() => expect(profileCalls()).toHaveLength(2));
     expect(await screen.findByRole('alert')).toHaveTextContent('Something went wrong. Please try again.');
   });
 

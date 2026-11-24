@@ -2,6 +2,7 @@
 import { healthRoute } from '../routes/health'; // app route (outside the knm markers)
 import { authRoute } from '../routes/auth'; // app route (outside the knm markers)
 import { profileRoute } from '../routes/profile'; // app route (outside the knm markers)
+import { dietRoute } from '../routes/diet'; // app route (outside the knm markers)
 // knm:imports
 
 export const routes = [
@@ -10,4 +11,5 @@ export const routes = [
   healthRoute, // app route (outside the knm markers)
   authRoute, // app route (outside the knm markers)
   profileRoute, // app route (outside the knm markers)
+  dietRoute, // app route (outside the knm markers)
 ];

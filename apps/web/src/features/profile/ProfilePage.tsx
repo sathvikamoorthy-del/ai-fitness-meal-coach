@@ -1,13 +1,15 @@
 // Profile screen (REQ-406, WI-070, mock.md): age, sex, height (cm), weight (kg), goal and fitness level, all required, metric
 // only. The form is checked before sending (profileRules.ts); the API is the authority. After saving, the daily calorie target
 // worked out by the API is shown, and the user stays here. A target of 0 kcal or less is refused (WI-070 q1): the API's
-// message is shown under Goal. The daily water target is not shown in this version.
+// message is shown under Goal. The daily water target is not shown in this version. Diet and allergies (REQ-407) are a
+// separate section below, with their own Save (DietSection).
 import React, { FormEvent, useEffect, useState } from 'react';
 import {
   Alert, AlertDescription, Box, Button, Divider, Flex, FormControl, FormErrorMessage, FormHelperText, FormLabel, Heading,
   Input, Radio, RadioGroup, Select, Stack, Text
 } from '@chakra-ui/react';
 import { authFetch } from '../../app/authFetch';
+import { DietSection } from './DietSection';
 import {
   checkProfile, EMPTY_FORM, FieldErrors, FITNESS_LEVEL_OPTIONS, formatKcal, GOAL_OPTIONS, ProfileField, ProfileForm,
   SEX_OPTIONS, toRequestBody
@@ -157,6 +159,7 @@ export function ProfilePage() {
           <Text fontSize="sm" color="gray.500">Worked out when the profile is saved.</Text>
         </>
       )}
+      <DietSection />
     </Box>
   );
 }
