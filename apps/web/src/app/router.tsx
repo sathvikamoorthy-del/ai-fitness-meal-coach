@@ -4,6 +4,7 @@ import { Navigate } from 'react-router-dom'; // app routes (outside the knm mark
 import { SignInPage } from '../features/auth/SignInPage'; // app route (outside the knm markers)
 import { RequireAuth } from '../features/auth/RequireAuth'; // app route (outside the knm markers)
 import { SignedInLayout } from '../features/auth/SignedInLayout'; // app route (outside the knm markers)
+import { ProfilePage } from '../features/profile/ProfilePage'; // app route (outside the knm markers)
 // knm:imports
 
 export const router = [
@@ -11,8 +12,8 @@ export const router = [
   // knm:entries-end
   { id: 'home', path: '/', element: <Navigate to="/signin" replace /> }, // app route (outside the knm markers)
   { id: 'signin', path: '/signin', element: <SignInPage /> }, // app route (outside the knm markers)
-  // Placeholders until REQ-406 (Profile) and the Today requirement fill these screens.
+  // Profile is REQ-406 (WI-070); Today stays a placeholder until its requirement fills it.
   // Signed-in screens get the header with Sign out (REQ-405).
-  { id: 'profile', path: '/profile', element: <RequireAuth><SignedInLayout><p>Profile</p></SignedInLayout></RequireAuth> }, // app route (outside the knm markers)
+  { id: 'profile', path: '/profile', element: <RequireAuth><SignedInLayout><ProfilePage /></SignedInLayout></RequireAuth> }, // app route (outside the knm markers)
   { id: 'today', path: '/today', element: <RequireAuth><SignedInLayout><p>Today</p></SignedInLayout></RequireAuth> }, // app route (outside the knm markers)
 ];

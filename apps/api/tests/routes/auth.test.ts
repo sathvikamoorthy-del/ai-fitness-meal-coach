@@ -37,8 +37,7 @@ describe('auth routes', () => {
     process.env.JWT_SECRET = SECRET;
     db = createDb({ url: ':memory:' });
     await migrate(db, migrations);
-    await db.execute("INSERT INTO goal_types (code, label) VALUES ('lose', 'Lose weight')");
-    await db.execute("INSERT INTO fitness_levels (code, label) VALUES ('beginner', 'Beginner')");
+    // goal_types 'lose' and fitness_levels 'beginner' come from the seed migration 0002_seed_profile_reference.sql (WI-070)
     const app = createApp({
       routes: [authRoute],
       middleware: [{ id: 'jwt-auth', handler: authenticate as any }, { id: 'session-check', handler: sessionCheck }],
