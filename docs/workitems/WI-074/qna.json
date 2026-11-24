@@ -1,0 +1,96 @@
+{
+  "entity_type": "workItem",
+  "entity_id": "WI-074",
+  "assigned_to": "EackSUlFzsWHlVljpQWgdDETfhs1",
+  "status": "pending",
+  "questions": [
+    {
+      "id": "q1",
+      "type": "single_choice",
+      "text": "Which AI provider and model creates the workout plan?",
+      "options": [
+        "Anthropic Claude API, model Claude Sonnet 5.5 (claude-sonnet-5-5): balanced quality and cost",
+        "Anthropic Claude API, model Claude Haiku 5.5 (claude-haiku-5-5): fastest and cheapest",
+        "Anthropic Claude API, model Claude Opus 5.5 (claude-opus-5-5): highest quality, slowest and most expensive"
+      ],
+      "reason": "REQ-409 open question; the walkthrough marks it 'Not defined'. The app has no AI setup yet: the API needs the provider's library and an API key in apps/api/.env (and on the host). Choose 'Other' to name a different provider or model.",
+      "required": true,
+      "answer": null,
+      "answered_by": null,
+      "answered_at": null
+    },
+    {
+      "id": "q2",
+      "type": "single_choice",
+      "text": "Can the user regenerate, edit or delete an AI plan?",
+      "options": [
+        "Generate again creates a new AI plan (older ones stay in the list); AI plans can be deleted, not edited",
+        "Generate again replaces the user's previous AI plan; AI plans cannot be edited or deleted",
+        "Generate again creates a new AI plan; AI plans can be edited and deleted like manual plans"
+      ],
+      "reason": "REQ-409 open question. REQ-410 left editing and deleting AI plans to REQ-409; today the API refuses both for AI plans (403).",
+      "required": true,
+      "answer": null,
+      "answered_by": null,
+      "answered_at": null
+    },
+    {
+      "id": "q3",
+      "type": "single_choice",
+      "text": "Does a newly generated AI plan become the active plan?",
+      "options": [
+        "Yes, like a newly saved manual plan (REQ-410): the previous active plan becomes inactive",
+        "No, it is saved inactive; the user makes it active from the Workouts list"
+      ],
+      "reason": "REQ-410 makes a new manual plan active; REQ-409 does not say whether an AI plan does the same.",
+      "required": true,
+      "answer": null,
+      "answered_by": null,
+      "answered_at": null
+    },
+    {
+      "id": "q4",
+      "type": "single_choice",
+      "text": "How many workout days does the AI plan have, and what rules apply to it?",
+      "options": [
+        "The AI picks the workout days (2 to 6, rest days in between) from goal and fitness level; same rules as manual plans (Day 1-7, sets 1-10, reps 1-100, at most 15 exercises a day, library exercises only)",
+        "Fixed by fitness level: beginner 3, intermediate 4, advanced 5 workout days; same rules as manual plans",
+        "The AI picks freely; only the library and Day 1-7 rules apply"
+      ],
+      "reason": "REQ-409 says only 'a week of workouts'. The plan is stored in the same tables as manual plans (Day 1 to 7), so it needs a rule for workout days and must fit the database limits.",
+      "required": true,
+      "answer": null,
+      "answered_by": null,
+      "answered_at": null
+    },
+    {
+      "id": "q5",
+      "type": "single_choice",
+      "text": "What happens if the AI fails, is slow, or returns a plan that breaks the rules (for example an exercise not in the library)?",
+      "options": [
+        "Show 'Creating your plan...' while waiting; retry once automatically on a broken plan; if it still fails, show 'Could not create a plan. Please try again.' and save nothing",
+        "Show 'Creating your plan...'; on any failure show the error at once and save nothing (no retry)",
+        "Drop the invalid parts and save the rest, as long as at least one valid exercise remains"
+      ],
+      "reason": "Not defined anywhere; the walkthrough notes that the real AI call takes time and shows no loading or error state.",
+      "required": true,
+      "answer": null,
+      "answered_by": null,
+      "answered_at": null
+    },
+    {
+      "id": "q6",
+      "type": "single_choice",
+      "text": "Who can generate a plan, and from where?",
+      "options": [
+        "Only users with a complete profile (all six REQ-406 fields); a 'Generate AI plan' button on the Workouts screen, which explains 'Complete your profile first.' with a link when the profile is incomplete",
+        "Any signed-in user; missing profile values are left out of the AI request"
+      ],
+      "reason": "REQ-409 says 'a user with a saved profile and goal can ask'. The goal and fitness level come from the profile (REQ-406), and REQ-410 says AI plans join the Workouts list.",
+      "required": true,
+      "answer": null,
+      "answered_by": null,
+      "answered_at": null
+    }
+  ]
+}
