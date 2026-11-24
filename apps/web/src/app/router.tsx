@@ -6,6 +6,9 @@ import { RequireAuth } from '../features/auth/RequireAuth'; // app route (outsid
 import { SignedInLayout } from '../features/auth/SignedInLayout'; // app route (outside the knm markers)
 import { ProfilePage } from '../features/profile/ProfilePage'; // app route (outside the knm markers)
 import { ExercisesPage } from '../features/exercises/ExercisesPage'; // app route (outside the knm markers)
+import { WorkoutsPage } from '../features/workouts/WorkoutsPage'; // app route (outside the knm markers)
+import { PlanEditorPage } from '../features/workouts/PlanEditorPage'; // app route (outside the knm markers)
+import { PlanViewPage } from '../features/workouts/PlanViewPage'; // app route (outside the knm markers)
 // knm:imports
 
 export const router = [
@@ -18,4 +21,9 @@ export const router = [
   { id: 'profile', path: '/profile', element: <RequireAuth><SignedInLayout><ProfilePage /></SignedInLayout></RequireAuth> }, // app route (outside the knm markers)
   { id: 'today', path: '/today', element: <RequireAuth><SignedInLayout><p>Today</p></SignedInLayout></RequireAuth> }, // app route (outside the knm markers)
   { id: 'exercises', path: '/exercises', element: <RequireAuth><SignedInLayout><ExercisesPage /></SignedInLayout></RequireAuth> }, // app route (outside the knm markers), REQ-408
+  // Workout plans (REQ-410)
+  { id: 'workouts', path: '/workouts', element: <RequireAuth><SignedInLayout><WorkoutsPage /></SignedInLayout></RequireAuth> }, // app route (outside the knm markers)
+  { id: 'workout-new', path: '/workouts/new', element: <RequireAuth><SignedInLayout><PlanEditorPage /></SignedInLayout></RequireAuth> }, // app route (outside the knm markers)
+  { id: 'workout-view', path: '/workouts/:id', element: <RequireAuth><SignedInLayout><PlanViewPage /></SignedInLayout></RequireAuth> }, // app route (outside the knm markers)
+  { id: 'workout-edit', path: '/workouts/:id/edit', element: <RequireAuth><SignedInLayout><PlanEditorPage /></SignedInLayout></RequireAuth> }, // app route (outside the knm markers)
 ];
