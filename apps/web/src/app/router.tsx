@@ -5,6 +5,7 @@ import { SignInPage } from '../features/auth/SignInPage'; // app route (outside 
 import { RequireAuth } from '../features/auth/RequireAuth'; // app route (outside the knm markers)
 import { SignedInLayout } from '../features/auth/SignedInLayout'; // app route (outside the knm markers)
 import { ProfilePage } from '../features/profile/ProfilePage'; // app route (outside the knm markers)
+import { ExercisesPage } from '../features/exercises/ExercisesPage'; // app route (outside the knm markers)
 // knm:imports
 
 export const router = [
@@ -16,4 +17,5 @@ export const router = [
   // Signed-in screens get the header with Sign out (REQ-405).
   { id: 'profile', path: '/profile', element: <RequireAuth><SignedInLayout><ProfilePage /></SignedInLayout></RequireAuth> }, // app route (outside the knm markers)
   { id: 'today', path: '/today', element: <RequireAuth><SignedInLayout><p>Today</p></SignedInLayout></RequireAuth> }, // app route (outside the knm markers)
+  { id: 'exercises', path: '/exercises', element: <RequireAuth><SignedInLayout><ExercisesPage /></SignedInLayout></RequireAuth> }, // app route (outside the knm markers), REQ-408
 ];

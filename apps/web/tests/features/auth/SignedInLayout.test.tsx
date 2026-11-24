@@ -21,6 +21,7 @@ const renderToday = () => renderApp(
   <Routes>
     <Route path="/signin" element={<SignInPage />} />
     <Route path="/today" element={<RequireAuth><SignedInLayout><p>Today page</p></SignedInLayout></RequireAuth>} />
+    <Route path="/exercises" element={<RequireAuth><SignedInLayout><p>Exercises page</p></SignedInLayout></RequireAuth>} />
   </Routes>,
   { route: '/today' }
 );
@@ -32,6 +33,17 @@ describe('SignedInLayout', () => {
     expect(screen.getByRole('heading', { name: 'AI Fitness & Meal Coach' })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Sign out' })).toBeInTheDocument();
     expect(screen.getByText('Today page')).toBeInTheDocument();
+  });
+
+  it('shows an Exercises link left of Sign out that opens /exercises (REQ-408)', () => {
+    setToken(validToken());
+    renderToday();
+    const link = screen.getByRole('link', { name: 'Exercises' });
+    expect(link).toHaveAttribute('href', '/exercises');
+    expect(link.compareDocumentPosition(screen.getByRole('button', { name: 'Sign out' })) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    fireEvent.click(link);
+    expect(screen.getByText('Exercises page')).toBeInTheDocument();
+    expect(fetchMock).not.toHaveBeenCalled();
   });
 
   it('Sign out ends the session on the server, clears the token and lands on /signin with no notice', async () => {
