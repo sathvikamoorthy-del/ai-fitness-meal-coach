@@ -1,0 +1,23 @@
+{
+  "entity_type": "workItem",
+  "entity_id": "WI-070",
+  "assigned_to": "EackSUlFzsWHlVljpQWgdDETfhs1",
+  "status": "pending",
+  "questions": [
+    {
+      "id": "q1",
+      "type": "single_choice",
+      "text": "Some valid profiles give a daily calorie target at or below 0 kcal. Example: female, 100 years, 100 cm, 30 kg, lose weight = (264 x 1.4) - 500 = -130 kcal. The database only accepts a target above 0. What should happen when the computed target is 0 kcal or less?",
+      "options": [
+        "Refuse the save with a message (e.g. 'This goal gives a calorie target that is too low; choose maintain or gain weight')",
+        "Apply a minimum target instead (give the value or values in the answer, e.g. 1,200 kcal)",
+        "Save it unchanged and change the database rule to allow 0 or negative targets"
+      ],
+      "reason": "REQ-406 accepts age 13-100, height 100-250 cm and weight 30-300 kg, but its formula (Mifflin-St Jeor x 1.4, -500 for lose) goes below 0 for some of these with goal 'lose weight'. profiles.daily_calorie_target has CHECK (> 0), so the save would currently fail with a server error. The plan cannot pick a behaviour without guessing.",
+      "required": true,
+      "answer": null,
+      "answered_by": null,
+      "answered_at": null
+    }
+  ]
+}
