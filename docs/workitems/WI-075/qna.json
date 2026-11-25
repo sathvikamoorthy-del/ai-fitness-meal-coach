@@ -2,7 +2,7 @@
   "entity_type": "workItem",
   "entity_id": "WI-075",
   "assigned_to": "EackSUlFzsWHlVljpQWgdDETfhs1",
-  "status": "pending",
+  "status": "completed",
   "questions": [
     {
       "id": "q1",
@@ -15,9 +15,10 @@
       ],
       "reason": "REQ-411 asks for logging in under 30 seconds but does not say how a session starts. Prefilling from the plan is the fastest; it also needs a rule for which plan day matches today.",
       "required": true,
-      "answer": null,
-      "answered_by": null,
-      "answered_at": null
+      "answer": "Prefilled from the active plan: 'Log today's workout' copies the exercises, sets and reps of the matching plan day (Day 1 = Monday ... Day 7 = Sunday); the user adds weights, adjusts and saves. Without an active plan, or on a rest day, the log starts empty",
+      "answered_by": "EackSUlFzsWHlVljpQWgdDETfhs1",
+      "answered_at": "2026-11-25T09:58:01.000Z",
+      "other": null
     },
     {
       "id": "q2",
@@ -29,9 +30,10 @@
       ],
       "reason": "REQ-411 open question: 'How is the 30-second target measured (from which screen, how many exercises)?'. The DB design has no column for a measured time.",
       "required": true,
-      "answer": null,
-      "answered_by": null,
-      "answered_at": null
+      "answer": "Design target only: a session of up to 5 exercises from the plan needs at most one tap per exercise plus Save; checked by hand in the test, not measured in the app",
+      "answered_by": "EackSUlFzsWHlVljpQWgdDETfhs1",
+      "answered_at": "2026-11-25T09:58:01.000Z",
+      "other": null
     },
     {
       "id": "q3",
@@ -44,9 +46,10 @@
       ],
       "reason": "The DB design stores session_date per session but does not say whether past dates or several sessions a day are allowed.",
       "required": true,
-      "answer": null,
-      "answered_by": null,
-      "answered_at": null
+      "answer": "Today by default; the user can pick a past date (no future dates); several sessions on the same date are allowed",
+      "answered_by": "EackSUlFzsWHlVljpQWgdDETfhs1",
+      "answered_at": "2026-11-25T09:58:01.000Z",
+      "other": null
     },
     {
       "id": "q4",
@@ -59,9 +62,10 @@
       ],
       "reason": "The DB design records sets, reps and weight_kg (>= 0) per exercise but sets no upper limits, weight steps, or duplicate rule. A session must have at least one exercise either way.",
       "required": true,
-      "answer": null,
-      "answered_by": null,
-      "answered_at": null
+      "answer": "Same as plans: sets 1-10, reps 1-100, at most 15 exercises; weight 0 to 500 kg in steps of 0.5 (0 = bodyweight); the same exercise may appear only once in a session",
+      "answered_by": "EackSUlFzsWHlVljpQWgdDETfhs1",
+      "answered_at": "2026-11-25T09:58:01.000Z",
+      "other": null
     },
     {
       "id": "q5",
@@ -74,9 +78,10 @@
       ],
       "reason": "Not stated in REQ-411. Editing or deleting a session also changes the best lifts in REQ-412, which are derived from logged sessions.",
       "required": true,
-      "answer": null,
-      "answered_by": null,
-      "answered_at": null
+      "answer": "Edit and delete (delete asks for confirmation, like plans)",
+      "answered_by": "EackSUlFzsWHlVljpQWgdDETfhs1",
+      "answered_at": "2026-11-25T09:58:01.000Z",
+      "other": null
     },
     {
       "id": "q6",
@@ -89,9 +94,10 @@
       ],
       "reason": "REQ-411 says the saved session appears with its date but not where. REQ-412 (history and best lifts) builds on it, so this also decides what REQ-412 adds.",
       "required": true,
-      "answer": null,
-      "answered_by": null,
-      "answered_at": null
+      "answer": "A 'Log workout' button on the Workouts screen opens the log form; after saving, a 'Recent sessions' list on the Workouts screen shows the last 5 sessions (date and exercise count). The full history stays with REQ-412",
+      "answered_by": "EackSUlFzsWHlVljpQWgdDETfhs1",
+      "answered_at": "2026-11-25T09:58:01.000Z",
+      "other": null
     }
   ]
 }
