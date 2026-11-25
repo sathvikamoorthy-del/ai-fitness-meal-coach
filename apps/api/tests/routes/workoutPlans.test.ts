@@ -1,4 +1,4 @@
-// Workout plan routes (REQ-410, WI-073).
+// Workout plan routes (REQ-410, WI-073) and AI plan generation (REQ-409, WI-074) with a fake generator.
 import fs from 'fs';
 import http from 'http';
 import path from 'path';
@@ -13,6 +13,7 @@ import { routes } from '../../src/glue/routes';
 import { createDb, Db } from '../../src/db/client';
 import { migrate } from '../../src/db/migrate';
 import { ormProvider } from '../../src/db/orm';
+import type { PlanGenerator } from '../../src/ai/planGenerator';
 
 const SECRET = 'test-secret-that-is-at-least-32-characters-long';
 const migrationsDir = path.join(__dirname, '../../src/db/migrations');
@@ -25,6 +26,14 @@ describe('workout plan routes', () => {
   let base: string;
   let ex: Record<string, string>;   // exercise name -> id, from the seed
   const previousSecret = process.env.JWT_SECRET;
+  let answers: (unknown | Error)[];        // what the fake generator returns (or throws), one per call
+  let generatorCalls: Parameters<PlanGenerator>[0][];
+  const fakeGenerator: PlanGenerator = async (input) => {
+    generatorCalls.push(input);
+    const next = answers.shift();
+    if (next instanceof Error) throw next;
+    return next;
+  };
 
   const rows = async (sql: string, args: any[] = []) => (await db.execute({ sql, args })).rows;
   const newUser = async () => {
@@ -58,12 +67,14 @@ describe('workout plan routes', () => {
       middleware: [{ id: 'jwt-auth', handler: authenticate as any }, { id: 'session-check', handler: sessionCheck }],
       providers: [
         { id: 'test-db', register: (a: Express) => { a.set('db', db); } },
-        { id: 'orm', register: (a: Express) => { ormProvider(a); } }
+        { id: 'orm', register: (a: Express) => { ormProvider(a); } },
+        { id: 'fake-ai', register: (a: Express) => { a.set('planGenerator', fakeGenerator); } }
       ]
     });
     server = await new Promise<http.Server>((resolve) => { const s = app.listen(0, () => resolve(s)); });
     base = `http://127.0.0.1:${(server.address() as any).port}`;
   });
+  beforeEach(() => { answers = []; generatorCalls = []; });
   afterAll(async () => {
     await new Promise((r) => server.close(r));
     db.close();
@@ -76,7 +87,7 @@ describe('workout plan routes', () => {
   });
 
   it('needs a signed-in user', async () => {
-    for (const [method, url] of [['GET', '/workout-plans'], ['POST', '/workout-plans'], ['GET', '/workout-plans/x'], ['PUT', '/workout-plans/x'], ['DELETE', '/workout-plans/x'], ['POST', '/workout-plans/x/activate']]) {
+    for (const [method, url] of [['GET', '/workout-plans'], ['POST', '/workout-plans'], ['GET', '/workout-plans/x'], ['PUT', '/workout-plans/x'], ['DELETE', '/workout-plans/x'], ['POST', '/workout-plans/x/activate'], ['POST', '/workout-plans/generate']]) {
       expect(await call(method, url, undefined, method === 'GET' || method === 'DELETE' ? undefined : {})).toEqual({ status: 401, body: { error: 'unauthorized' } });
     }
   });
@@ -153,14 +164,101 @@ describe('workout plan routes', () => {
     expect((await call('GET', '/workout-plans', other.token)).body.plans).toEqual([]);
   });
 
-  it('an AI plan can be opened and made active but not edited or deleted (403)', async () => {
+  it('an AI plan can be opened, made active and deleted, but not edited (403)', async () => {
     const { userId, token } = await newUser();
     const aiId = crypto.randomUUID();
     await db.execute({ sql: "INSERT INTO workout_plans (id, user_id, source, is_active) VALUES (?, ?, 'ai', 0)", args: [aiId, userId] });
     expect((await call('GET', `/workout-plans/${aiId}`, token)).body.plan).toMatchObject({ source: 'ai', isActive: false });
     expect(await call('PUT', `/workout-plans/${aiId}`, token, simple())).toEqual({ status: 403, body: { error: 'not-editable' } });
-    expect(await call('DELETE', `/workout-plans/${aiId}`, token)).toEqual({ status: 403, body: { error: 'not-editable' } });
     expect((await call('POST', `/workout-plans/${aiId}/activate`, token)).body.plan.isActive).toBe(true);
+    expect(await call('DELETE', `/workout-plans/${aiId}`, token)).toEqual({ status: 204, body: null });   // REQ-409 q2
+    expect(await rows('SELECT id FROM workout_plans WHERE id = ?', [aiId])).toHaveLength(0);
+  });
+
+  describe('POST /workout-plans/generate', () => {
+    const PROFILE = { age: 30, sex: 'female', height_cm: 165, weight_kg: 62, goal_type: 'lose', fitness_level: 'beginner' };
+    const withProfile = async (overrides: Record<string, unknown> = {}) => {
+      const u = await newUser();
+      const p = { ...PROFILE, ...overrides };
+      await db.execute({
+        sql: 'INSERT INTO profiles (user_id, age, sex, height_cm, weight_kg, goal_type, fitness_level) VALUES (?, ?, ?, ?, ?, ?, ?)',
+        args: [u.userId, p.age, p.sex, p.height_cm, p.weight_kg, p.goal_type, p.fitness_level] as any[]
+      });
+      return u;
+    };
+    const good = () => days({ 1: [['Back squat', 3, 10], ['Push-up', 3, 12]], 3: [['Plank', 3, 30]], 5: [['Deadlift', 3, 8]] });
+    beforeEach(() => { jest.spyOn(console, 'warn').mockImplementation(() => {}); });   // failed tries are logged on purpose
+    afterEach(() => { jest.restoreAllMocks(); });
+    const plansOf = async (userId: string) => rows('SELECT id, source, is_active FROM workout_plans WHERE user_id = ?', [userId]);
+
+    it('saves a valid first answer as an active AI plan and sends only the profile fields and the library', async () => {
+      const { userId, token } = await withProfile();
+      answers = [good()];
+      const res = await call('POST', '/workout-plans/generate', token);
+      expect(res.status).toBe(201);
+      expect(res.body.plan).toMatchObject({ source: 'ai', isActive: true });
+      expect(res.body.plan.days.map((d: any) => d.exercises.map((e: any) => e.name))).toEqual([['Back squat', 'Push-up'], [], ['Plank'], [], ['Deadlift'], [], []]);
+      expect(generatorCalls).toHaveLength(1);
+      expect(generatorCalls[0].profile).toEqual({ age: 30, sex: 'female', heightCm: 165, weightKg: 62, goal: 'lose', fitnessLevel: 'beginner' });
+      expect(generatorCalls[0].library).toHaveLength(40);
+      expect(Object.keys(generatorCalls[0].library[0]).sort()).toEqual(['id', 'name']);
+      expect(await activeIds(userId)).toEqual([res.body.plan.id]);
+    });
+
+    it('retries once on a broken answer (rules, shape or error) and saves the second answer', async () => {
+      const brokenAnswers: unknown[] = [days({ 1: [['Back squat', 11, 8]], 3: [['Plank', 3, 30]] }), days({ 2: [['Plank', 3, 30]] }), { nope: true }, new Error('timeout')];
+      for (const broken of brokenAnswers) {
+        const { userId, token } = await withProfile();
+        answers = [broken, good()];
+        generatorCalls = [];
+        const res = await call('POST', '/workout-plans/generate', token);
+        expect(res.status).toBe(201);
+        expect(generatorCalls).toHaveLength(2);
+        expect((await plansOf(userId)).map((p) => [p.source, p.is_active])).toEqual([['ai', 1]]);
+      }
+    });
+
+    it('answers 502 ai-failed and saves nothing when both tries fail', async () => {
+      const pairs: unknown[][] = [[days({ 1: [['Back squat', 3, 0]] }), { days: [] }], [new Error('network'), new Error('network')]];
+      for (const pair of pairs) {
+        const { userId, token } = await withProfile();
+        answers = [...pair];
+        generatorCalls = [];
+        expect(await call('POST', '/workout-plans/generate', token)).toEqual({ status: 502, body: { error: 'ai-failed' } });
+        expect(generatorCalls).toHaveLength(2);
+        expect(await plansOf(userId)).toHaveLength(0);
+      }
+    });
+
+    it('a failed generation keeps the current active plan', async () => {
+      const { userId, token } = await withProfile();
+      const manual = (await call('POST', '/workout-plans', token, simple())).body.plan;
+      answers = [new Error('x'), new Error('x')];
+      expect((await call('POST', '/workout-plans/generate', token)).status).toBe(502);
+      expect(await activeIds(userId)).toEqual([manual.id]);
+    });
+
+    it('generating again adds a new active AI plan and keeps the older ones', async () => {
+      const { userId, token } = await withProfile();
+      answers = [good()];
+      const first = (await call('POST', '/workout-plans/generate', token)).body.plan;
+      await pause();
+      answers = [good()];
+      const second = (await call('POST', '/workout-plans/generate', token)).body.plan;
+      const list = (await call('GET', '/workout-plans', token)).body.plans;
+      expect(list.map((p: any) => [p.id, p.source, p.isActive])).toEqual([[second.id, 'ai', true], [first.id, 'ai', false]]);
+      expect(await activeIds(userId)).toEqual([second.id]);
+    });
+
+    it('answers 400 profile-incomplete without calling the AI when the profile is missing or incomplete', async () => {
+      const none = await newUser();
+      expect(await call('POST', '/workout-plans/generate', none.token)).toEqual({ status: 400, body: { error: 'profile-incomplete' } });
+      for (const field of Object.keys(PROFILE)) {
+        const u = await withProfile({ [field]: null });
+        expect(await call('POST', '/workout-plans/generate', u.token)).toEqual({ status: 400, body: { error: 'profile-incomplete' } });
+      }
+      expect(generatorCalls).toHaveLength(0);
+    });
   });
 
   it('invalid input answers 400 with every message and writes nothing', async () => {

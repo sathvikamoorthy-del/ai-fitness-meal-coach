@@ -4,10 +4,13 @@
 //   POST   /workout-plans { days }      -> 201 { plan }   a manual plan, made active        | 400 invalid-plan { errors }
 //   GET    /workout-plans/:id           -> 200 { plan }   all seven days, exercises in position order, [] = rest day
 //   PUT    /workout-plans/:id { days }  -> 200 { plan }   manual only, active status kept   | 400 | 403 not-editable
-//   DELETE /workout-plans/:id           -> 204            manual only                       | 403 not-editable
+//   DELETE /workout-plans/:id           -> 204            manual and AI plans (REQ-409, WI-074 q2)
 //   POST   /workout-plans/:id/activate  -> 200 { plan }   any plan of the user
+//   POST   /workout-plans/generate      -> 201 { plan }   an AI plan, made active (REQ-409, WI-074)
+//                                        | 400 profile-incomplete (any of the six profile fields missing; no AI call)
+//                                        | 502 ai-failed (two tries without a valid plan; nothing saved)
 // Each write is one batch (all or nothing). The previously active plan is cleared before another is set active, because
-// the database allows one active plan per user (uq_workout_plans_one_active). AI plans belong to REQ-409.
+// the database allows one active plan per user (uq_workout_plans_one_active).
 import crypto from 'crypto';
 import { and, asc, desc, eq, inArray, ne, sql } from 'drizzle-orm';
 import { Request, Response, Router } from 'express';
@@ -19,7 +22,12 @@ import { workout_plan_days } from '../db/models/workout_plan_days';
 import { workout_plan_exercises } from '../db/models/workout_plan_exercises';
 import { requireAuth } from '../auth/authMiddleware';
 import type { AuthClaims } from '../auth/jwt';
+import { profiles } from '../db/models/profiles';
 import { DAYS, PlanInput, validatePlan } from '../workouts/planRules';
+import { checkAiPlan } from '../workouts/aiPlanRules';
+import type { AiPlanProfile, PlanGenerator } from '../ai/planGenerator';
+
+const AI_TRIES = 2;   // the first try and one automatic retry on a broken plan (WI-074 q5)
 
 const NOW = sql`(strftime('%Y-%m-%dT%H:%M:%fZ','now'))`;
 const ormOf = (req: Request) => req.app.get('orm') as Orm;
@@ -83,18 +91,50 @@ async function listPlans(req: Request, res: Response) {
   res.json({ plans: rows.map((p) => ({ id: p.id, source: p.source, isActive: p.is_active === 1, createdAt: p.created_at })) });
 }
 
+/** Saves a new plan of the user as the active one (the previous active plan is cleared first), in one batch. */
+async function saveNewActivePlan(orm: Orm, userId: string, source: 'manual' | 'ai', input: PlanInput) {
+  const id = crypto.randomUUID();
+  await batch(orm, [
+    orm.update(workout_plans).set({ is_active: 0, updated_at: NOW }).where(and(eq(workout_plans.user_id, userId), eq(workout_plans.is_active, 1))),
+    orm.insert(workout_plans).values({ id, user_id: userId, source, is_active: 1 }),
+    ...dayInserts(orm, id, input)
+  ]);
+  return readPlan(orm, (await ownPlan(orm, userId, id))!);
+}
+
 async function createPlan(req: Request, res: Response) {
   const orm = ormOf(req);
   const result = validatePlan(req.body, await library(orm));
   if (!result.ok) return void res.status(400).json({ error: 'invalid-plan', errors: result.errors });
+  res.status(201).json({ plan: await saveNewActivePlan(orm, userIdOf(req), 'manual', result.value) });
+}
+
+/** The six REQ-406 fields, or null when the profile is missing or any of them is empty (WI-074 q6). */
+async function completeProfile(orm: Orm, userId: string): Promise<AiPlanProfile | null> {
+  const [p] = await orm.select().from(profiles).where(eq(profiles.user_id, userId)).limit(1);
+  if (!p || p.age == null || !p.sex || p.height_cm == null || p.weight_kg == null || !p.goal_type || !p.fitness_level) return null;
+  return { age: p.age, sex: p.sex, heightCm: p.height_cm, weightKg: p.weight_kg, goal: p.goal_type, fitnessLevel: p.fitness_level };
+}
+
+async function generatePlan(req: Request, res: Response) {
+  const orm = ormOf(req);
   const userId = userIdOf(req);
-  const id = crypto.randomUUID();
-  await batch(orm, [
-    orm.update(workout_plans).set({ is_active: 0, updated_at: NOW }).where(and(eq(workout_plans.user_id, userId), eq(workout_plans.is_active, 1))),
-    orm.insert(workout_plans).values({ id, user_id: userId, source: 'manual', is_active: 1 }),
-    ...dayInserts(orm, id, result.value)
-  ]);
-  res.status(201).json({ plan: await readPlan(orm, (await ownPlan(orm, userId, id))!) });
+  const profile = await completeProfile(orm, userId);
+  if (!profile) return void res.status(400).json({ error: 'profile-incomplete' });
+  const generator = req.app.get('planGenerator') as PlanGenerator | undefined;
+  if (!generator) throw new Error('no plan generator registered (app.get("planGenerator") is empty)');
+  const lib = await library(orm);
+  const exerciseList = [...lib].map(([id, name]) => ({ id, name }));
+  for (let attempt = 1; attempt <= AI_TRIES; attempt++) {
+    try {
+      const checked = checkAiPlan(await generator({ profile, library: exerciseList }), lib);
+      if (checked.ok) return void res.status(201).json({ plan: await saveNewActivePlan(orm, userId, 'ai', checked.value) });
+      console.warn(`AI plan try ${attempt} broke the rules: ${checked.errors.join(' ')}`);
+    } catch (err) {
+      console.warn(`AI plan try ${attempt} failed: ${err instanceof Error ? `${err.name}: ${err.message}` : 'unknown error'}`);
+    }
+  }
+  res.status(502).json({ error: 'ai-failed' });
 }
 
 async function getPlan(req: Request, res: Response) {
@@ -123,7 +163,6 @@ async function deletePlan(req: Request, res: Response) {
   const orm = ormOf(req);
   const plan = await ownPlan(orm, userIdOf(req), req.params.id);
   if (!plan) return void res.status(404).json({ error: 'not-found' });
-  if (plan.source !== 'manual') return void res.status(403).json({ error: 'not-editable' });
   await batch(orm, [...dayDeletes(orm, plan.id), orm.delete(workout_plans).where(eq(workout_plans.id, plan.id))]);
   res.status(204).end();
 }
@@ -147,6 +186,7 @@ export const workoutPlansRoute: RouteEntry = {
   mount: (router: Router) => {
     router.get('/workout-plans', requireAuth, wrapAsync(listPlans));
     router.post('/workout-plans', requireAuth, wrapAsync(createPlan));
+    router.post('/workout-plans/generate', requireAuth, wrapAsync(generatePlan));
     router.get('/workout-plans/:id', requireAuth, wrapAsync(getPlan));
     router.put('/workout-plans/:id', requireAuth, wrapAsync(updatePlan));
     router.delete('/workout-plans/:id', requireAuth, wrapAsync(deletePlan));

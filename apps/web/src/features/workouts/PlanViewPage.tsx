@@ -1,5 +1,6 @@
 // One workout plan (REQ-410, WI-073, mock.md): its label and Active badge, Day 1 to Day 7 with "Back squat 3 × 8 · ..."
-// or "Rest day", and Edit / Delete for manual plans (Delete asks first, then returns to /workouts).
+// or "Rest day", Edit for manual plans and Delete for every plan (REQ-409 q2: AI plans can be deleted, not edited).
+// Delete asks first, then returns to /workouts.
 import React, { useEffect, useState } from 'react';
 import { Link as RouterLink, useNavigate, useParams } from 'react-router-dom';
 import { Badge, Box, Button, Flex, Heading, HStack, Stack, Text } from '@chakra-ui/react';
@@ -64,12 +65,10 @@ export function PlanViewPage() {
           <Heading as="h2" size="lg">{planLabel(plan.source, plan.createdAt)}</Heading>
           {plan.isActive && <Badge colorScheme="green">Active</Badge>}
         </HStack>
-        {manual && (
-          <HStack>
-            <Button as={RouterLink} to={`/workouts/${plan.id}/edit`} size="sm" variant="outline">Edit</Button>
-            <Button size="sm" colorScheme="red" variant="outline" onClick={() => setConfirming(true)}>Delete</Button>
-          </HStack>
-        )}
+        <HStack>
+          {manual && <Button as={RouterLink} to={`/workouts/${plan.id}/edit`} size="sm" variant="outline">Edit</Button>}
+          <Button size="sm" colorScheme="red" variant="outline" onClick={() => setConfirming(true)}>Delete</Button>
+        </HStack>
       </Flex>
       <Stack as="ol" spacing={2} listStyleType="none" aria-label="Plan days">
         {plan.days.map((d) => (

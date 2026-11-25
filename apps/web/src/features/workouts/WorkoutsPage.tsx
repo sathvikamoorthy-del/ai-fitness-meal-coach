@@ -1,16 +1,23 @@
 // Workouts screen (REQ-410, WI-073, mock.md): the user's plans newest first, the active one marked, Build my own plan,
-// Make active / Open / Edit / Delete (Edit and Delete for manual plans only; AI plans belong to REQ-409). Delete asks first.
+// Make active / Open / Edit / Delete (Edit for manual plans only). Delete asks first.
+// Generate AI plan (REQ-409, WI-074): only with a complete profile (q6), "Creating your plan..." while the API works, and
+// one failure message when it could not make a valid plan (q5). The new AI plan becomes active (q3); AI plans can be
+// deleted but not edited (q2).
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Link as RouterLink, useNavigate } from 'react-router-dom';
 import {
   AlertDialog, AlertDialogBody, AlertDialogContent, AlertDialogFooter, AlertDialogHeader, AlertDialogOverlay, Badge, Box,
-  Button, Flex, Heading, HStack, Stack, Text
+  Button, Flex, Heading, HStack, Link, Stack, Text
 } from '@chakra-ui/react';
 import { authFetch } from '../../app/authFetch';
 import { planLabel } from './planRules';
 
 export const FALLBACK_MESSAGE = 'Something went wrong. Please try again.';
 export const DELETE_QUESTION = 'Delete this plan? This cannot be undone.';
+export const PROFILE_FIRST = 'Complete your profile first.';
+export const CREATING = 'Creating your plan...';
+export const AI_FAILED = 'Could not create a plan. Please try again.';
+const PROFILE_FIELDS = ['age', 'sex', 'heightCm', 'weightKg', 'goal', 'fitnessLevel'];
 
 export interface PlanSummary { id: string; source: string; isActive: boolean; createdAt: string }
 
@@ -40,6 +47,9 @@ export function WorkoutsPage() {
   const [error, setError] = useState(false);
   const [toDelete, setToDelete] = useState<PlanSummary | null>(null);
   const [busy, setBusy] = useState(false);
+  const [profileComplete, setProfileComplete] = useState(true);   // the API decides when the profile cannot be read
+  const [generating, setGenerating] = useState(false);
+  const [aiFailed, setAiFailed] = useState(false);
 
   const load = useCallback(async () => {
     try {
@@ -55,6 +65,36 @@ export function WorkoutsPage() {
     }
   }, []);
   useEffect(() => { load(); }, [load]);
+  useEffect(() => {
+    let live = true;
+    (async () => {
+      try {
+        const res = await authFetch('/api/profile');
+        if (res.status !== 200) return;
+        const data: any = await res.json();
+        if (live) setProfileComplete(!!data?.profile && PROFILE_FIELDS.every((f) => data.profile[f] !== null && data.profile[f] !== undefined && data.profile[f] !== ''));
+      } catch { /* unknown: leave the button on, the API checks again */ }
+    })();
+    return () => { live = false; };
+  }, []);
+
+  const generate = async () => {
+    setGenerating(true);
+    setAiFailed(false);
+    try {
+      const res = await authFetch('/api/workout-plans/generate', { method: 'POST' });
+      if (res.status === 201) await load();
+      else if (res.status === 400) {
+        let data: any = null;
+        try { data = await res.json(); } catch { /* no JSON body */ }
+        if (data?.error === 'profile-incomplete') setProfileComplete(false); else setAiFailed(true);
+      } else if (res.status !== 401) setAiFailed(true);
+    } catch {
+      setAiFailed(true);
+    } finally {
+      setGenerating(false);
+    }
+  };
 
   const act = async (request: () => Promise<Response>, ok: number) => {
     setBusy(true);
@@ -79,8 +119,16 @@ export function WorkoutsPage() {
     <Box maxW="2xl">
       <Flex justify="space-between" align="center" mb={6}>
         <Heading as="h2" size="lg">Workouts</Heading>
-        <Button colorScheme="teal" onClick={() => navigate('/workouts/new')}>Build my own plan</Button>
+        <HStack spacing={2}>
+          <Button colorScheme="teal" variant="outline" onClick={generate} isDisabled={!profileComplete || generating}>Generate AI plan</Button>
+          <Button colorScheme="teal" onClick={() => navigate('/workouts/new')}>Build my own plan</Button>
+        </HStack>
       </Flex>
+      {!profileComplete && (
+        <Text mb={4}>{PROFILE_FIRST} <Link as={RouterLink} to="/profile" color="teal.600">Go to profile</Link></Text>
+      )}
+      {generating && <Text role="status" mb={4}>{CREATING}</Text>}
+      {aiFailed && <Text role="alert" color="red.500" mb={4}>{AI_FAILED}</Text>}
       {error && <Text role="alert" color="red.500" mb={4}>{FALLBACK_MESSAGE}</Text>}
       {loading ? <Text>Loading...</Text> : plans.length === 0 ? <Text>No workout plans yet.</Text> : (
         <Stack as="ul" spacing={3} listStyleType="none" aria-label="Workout plans">
@@ -97,7 +145,7 @@ export function WorkoutsPage() {
                   {!p.isActive && <Button size="sm" onClick={() => makeActive(p)} isDisabled={busy} aria-label={`Make ${label} active`}>Make active</Button>}
                   <Button as={RouterLink} to={`/workouts/${p.id}`} size="sm" variant="outline" aria-label={`Open ${label}`}>Open</Button>
                   {manual && <Button as={RouterLink} to={`/workouts/${p.id}/edit`} size="sm" variant="outline" aria-label={`Edit ${label}`}>Edit</Button>}
-                  {manual && <Button size="sm" colorScheme="red" variant="outline" onClick={() => setToDelete(p)} isDisabled={busy} aria-label={`Delete ${label}`}>Delete</Button>}
+                  <Button size="sm" colorScheme="red" variant="outline" onClick={() => setToDelete(p)} isDisabled={busy} aria-label={`Delete ${label}`}>Delete</Button>
                 </HStack>
               </Flex>
             );

@@ -1,4 +1,5 @@
-// Plan view (REQ-410, WI-073): days in order, rest days, Active badge, Edit/Delete for manual plans, delete with confirmation.
+// Plan view (REQ-410, WI-073; REQ-409, WI-074): days in order, rest days, Active badge, Edit for manual plans, Delete for
+// every plan, delete with confirmation.
 import React from 'react';
 import { fireEvent, screen, waitFor, within } from '@testing-library/react';
 import { Route, Routes } from 'react-router-dom';
@@ -56,13 +57,17 @@ describe('PlanViewPage', () => {
     expect(screen.getByRole('link', { name: 'Edit' })).toHaveAttribute('href', '/workouts/p1/edit');
   });
 
-  it('an inactive AI plan has no badge and no Edit or Delete', async () => {
+  it('an inactive AI plan has no badge and no Edit, but can be deleted', async () => {
     answer('GET /api/workout-plans/p1', { status: 200, body: { plan: plan('ai', false) } });
+    answer('DELETE /api/workout-plans/p1', { status: 204 });
     renderAt();
     expect(await screen.findByRole('heading', { name: 'AI plan · 24 Nov 2026' })).toBeInTheDocument();
     expect(screen.queryByText('Active')).not.toBeInTheDocument();
     expect(screen.queryByRole('link', { name: 'Edit' })).not.toBeInTheDocument();
-    expect(screen.queryByRole('button', { name: 'Delete' })).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'Delete' }));
+    fireEvent.click(within(await screen.findByRole('alertdialog')).getByRole('button', { name: 'Delete' }));
+    expect(await screen.findByText('Workouts page')).toBeInTheDocument();
+    expect(calls('DELETE /api/workout-plans/p1')).toHaveLength(1);
   });
 
   it('Delete asks first, then deletes and returns to Workouts', async () => {
