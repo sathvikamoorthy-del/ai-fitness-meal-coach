@@ -28,7 +28,7 @@ The open question "Fitness level is not in the profile" was already resolved by 
    - the rules.
 5. The API checks the answer:
    - It runs the same `validatePlan` used for manual plans.
-   - It also requires 2 to 6 workout days, and no two workout days in a row.
+   - It also requires 2 to 6 workout days. The prompt asks the AI to spread rest days through the week, but this is not enforced: a strict "never two workout days in a row" rule would allow at most four workout days in seven, which contradicts q4.
 6. If the answer is broken, the API asks once more. A broken answer is any of these:
    - not valid JSON, or not in the expected shape;
    - it breaks a rule;
@@ -51,11 +51,11 @@ The open question "Fitness level is not in the profile" was already resolved by 
     - the schema: `{ days: [{ dayNumber, exercises: [{ exerciseId, sets, reps }] }] }`, with `additionalProperties: false` and the integer and enum limits;
     - `exerciseId` an enum of the library ids.
   - It checks `stop_reason` (`refusal` and `max_tokens` count as broken) before reading the text block, then runs `JSON.parse`.
-  - **System prompt:** the rules in plain words. Use only the given exercise ids. Choose 2–6 workout days that fit the goal and fitness level, with rest days in between. Keep sets 1–10, reps 1–100, at most 15 exercises a day, and no exercise twice in a day.
+  - **System prompt:** the rules in plain words. Use only the given exercise ids. Choose 2–6 workout days that fit the goal and fitness level, with the rest days spread through the week. Keep sets 1–10, reps 1–100, at most 15 exercises a day, and no exercise twice in a day.
   - **Provider:** `aiPlanProvider` registers the real generator with `app.set('planGenerator', …)`. Tests set a fake one, so they never call the network.
 - **`src/glue/providers.ts`:** register `aiPlanProvider` outside the knm markers, like the app routes.
 - **`src/workouts/aiPlanRules.ts`** (new): `checkAiPlan(value, libraryMap)`.
-  - It runs `validatePlan`, then counts workout days (2–6) and rejects two workout days in a row.
+  - It runs `validatePlan`, then counts workout days (2–6).
   - It returns `{ ok, value | errors }`. The errors are for the server log only.
 - **`src/routes/workoutPlans.ts`:**
   - **`POST /workout-plans/generate` → 201 `{ plan }`:**
@@ -78,7 +78,7 @@ The open question "Fitness level is not in the profile" was already resolved by 
 
 ## Tests
 - **API:**
-  - `tests/workouts/aiPlanRules.test.ts` (day count, rest between workout days, library and limits through `validatePlan`).
+  - `tests/workouts/aiPlanRules.test.ts` (workout-day count 2–6, back-to-back workout days allowed, library and limits through `validatePlan`).
   - `tests/routes/workoutPlans.test.ts` additions, using a fake generator:
     - valid first try;
     - broken then valid (two calls);
